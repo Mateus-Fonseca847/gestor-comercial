@@ -1,8 +1,7 @@
 "use client";
 
-import { SalesOrderForm } from "@/modules/vendas/components/sales-order-form";
+import { CommercialOrderForm } from "@/modules/vendas/components/commercial-order-form";
 
 export function NovoPedidoWhatsappPage() {
-  return <SalesOrderForm mode="whatsapp" />;
+  return <CommercialOrderForm defaultCanal="whatsapp" />;
 }
-

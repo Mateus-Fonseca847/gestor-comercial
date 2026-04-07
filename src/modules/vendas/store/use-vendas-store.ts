@@ -9,6 +9,7 @@ import type { SalvarVendaInput, VendaRegistro } from "@/modules/vendas/types";
 type VendasStore = {
   vendas: VendaRegistro[];
   actions: {
+    salvarRegistroComercial: (input: SalvarVendaInput) => string | null;
     salvarVendaRascunho: (input: Omit<SalvarVendaInput, "status">) => string | null;
     concluirVenda: (input: Omit<SalvarVendaInput, "status" | "canal">) => string | null;
     criarPedidoWhatsapp: (
@@ -63,11 +64,20 @@ export const useVendasStore = create<VendasStore>()(
     (set) => ({
       vendas: [],
       actions: {
+        salvarRegistroComercial: (input) => {
+          const venda = createVendaRegistro(input);
+          if (!venda) {
+            return null;
+          }
+          set((state) => ({
+            vendas: [venda, ...state.vendas],
+          }));
+          return venda.id;
+        },
         salvarVendaRascunho: (input) => {
           const venda = createVendaRegistro({
             ...input,
-            canal: input.canal,
-            status: "rascunho",
+            status: "em_aberto",
           });
 
           if (!venda) {
@@ -101,7 +111,7 @@ export const useVendasStore = create<VendasStore>()(
           const venda = createVendaRegistro({
             ...input,
             canal: "whatsapp",
-            status: "pendente",
+            status: "aguardando_confirmacao",
           });
 
           if (!venda) {
@@ -125,4 +135,3 @@ export const useVendasStore = create<VendasStore>()(
     },
   ),
 );
-

@@ -1,5 +1,5 @@
-import { ModuleDashboardScreen } from "@/modules/shared/components/module-screens";
+import { redirect } from "next/navigation";
 
 export default function CadastrosPage() {
-  return <ModuleDashboardScreen moduleKey="cadastros" />;
+  redirect("/cadastros/clientes");
 }

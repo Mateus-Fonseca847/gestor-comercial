@@ -1,8 +1,11 @@
 "use client";
 
-import { SalesOrderForm } from "@/modules/vendas/components/sales-order-form";
+import { useSearchParams } from "next/navigation";
+import { CommercialOrderForm } from "@/modules/vendas/components/commercial-order-form";
 
 export function NovaVendaPage() {
-  return <SalesOrderForm mode="loja" />;
-}
+  const searchParams = useSearchParams();
+  const canal = searchParams.get("canal") === "whatsapp" ? "whatsapp" : "loja";
 
+  return <CommercialOrderForm defaultCanal={canal} />;
+}

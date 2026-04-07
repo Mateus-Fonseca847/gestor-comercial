@@ -1,13 +1,12 @@
 ﻿"use client";
 
-import { Bell, HelpCircle, Search, Settings } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import GestifyHomeButton from "@/components/layout/gestify-home-button";
 import { ModuleMegaMenu } from "@/components/navigation/module-mega-menu";
 import { moduleNavigation } from "@/config/module-navigation";
 import { navigationItems } from "@/config/navigation";
-import { estoqueNavigationItems } from "@/modules/estoque/config/navigation";
 
 export function AppHeader() {
   const pathname = usePathname();
@@ -18,7 +17,7 @@ export function AppHeader() {
         <GestifyHomeButton />
 
         <nav className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-visible">
-          {navigationItems.map((item, index) => {
+          {navigationItems.map((item) => {
             const isActive =
               item.behavior === "menu"
                 ? item.href === "/"
@@ -35,33 +34,12 @@ export function AppHeader() {
                 return null;
               }
 
-              const menuData =
-                item.href === "/estoque"
-                  ? {
-                      sections: [
-                        {
-                          title: "principal",
-                          items: estoqueNavigationItems.map((entry) => ({
-                            title: entry.label,
-                            href: entry.href,
-                          })),
-                        },
-                      ],
-                    }
-                  : menuItem.menu;
-
               return (
-                <div
-                  key={item.href}
-                  className={[
-                    index === 4 ? "ml-2 border-l border-[var(--color-border)] pl-3" : "",
-                    item.priority === "secondary" ? "opacity-80" : "",
-                  ].join(" ")}
-                >
+                <div key={item.href}>
                   <ModuleMegaMenu
                     triggerLabel={item.label}
                     active={isActive}
-                    data={menuData}
+                    data={menuItem.menu}
                   />
                 </div>
               );
@@ -76,7 +54,6 @@ export function AppHeader() {
                   isActive
                     ? "bg-[rgba(0,74,173,0.08)] text-[var(--color-primary)]"
                     : "text-[var(--color-text-soft)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-primary)]",
-                  item.priority === "secondary" ? "opacity-80" : "",
                 ].join(" ")}
               >
                 <span>{item.label}</span>
@@ -100,37 +77,8 @@ export function AppHeader() {
               className="w-full border-0 bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-muted)]"
             />
           </label>
-
-          <HeaderIconButton ariaLabel="Ajuda">
-            <HelpCircle className="h-5 w-5" />
-          </HeaderIconButton>
-
-          <HeaderIconButton ariaLabel="Notificações">
-            <Bell className="h-5 w-5" />
-          </HeaderIconButton>
-
-          <HeaderIconButton ariaLabel="Configurações">
-            <Settings className="h-5 w-5" />
-          </HeaderIconButton>
         </div>
       </div>
     </header>
-  );
-}
-
-type HeaderIconButtonProps = {
-  ariaLabel: string;
-  children: React.ReactNode;
-};
-
-function HeaderIconButton({ ariaLabel, children }: HeaderIconButtonProps) {
-  return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      className="flex h-10 w-10 items-center justify-center rounded-xl border border-transparent text-[var(--color-text-soft)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-border)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-primary)]"
-    >
-      {children}
-    </button>
   );
 }

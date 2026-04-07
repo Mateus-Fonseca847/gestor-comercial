@@ -1,5 +1,5 @@
-import { NovoPedidoWhatsappPage } from "@/modules/vendas/views/novo-pedido-whatsapp-page";
+import { redirect } from "next/navigation";
 
 export default function NovoPedidoWhatsappRoute() {
-  return <NovoPedidoWhatsappPage />;
+  redirect("/vendas/nova?canal=whatsapp");
 }

@@ -20,7 +20,7 @@ const quickActions = [
   {
     label: "Novo pedido WhatsApp",
     description: "Registrar pedido recebido no atendimento.",
-    href: "/vendas/pedidos/novo",
+    href: "/vendas/nova?canal=whatsapp",
     icon: MessageCircleMore,
   },
   {
@@ -75,7 +75,7 @@ export function HomeOperationalPage() {
       <ActionBar
         items={[
           { label: "Nova venda", href: "/vendas/nova" },
-          { label: "Novo pedido WhatsApp", tone: "neutral", href: "/vendas/pedidos/novo" },
+          { label: "Novo pedido WhatsApp", tone: "neutral", href: "/vendas/nova?canal=whatsapp" },
           { label: "Registrar entrada de estoque", tone: "neutral", href: "/estoque/entradas" },
         ]}
       />

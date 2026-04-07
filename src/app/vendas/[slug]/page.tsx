@@ -1,3 +1,4 @@
+import { notFound, redirect } from "next/navigation";
 import { ModuleChildScreen, ModuleReportsScreen } from "@/modules/shared/components/module-screens";
 
 export default async function VendasChildPage({
@@ -9,6 +10,14 @@ export default async function VendasChildPage({
 
   if (slug === "relatorios") {
     return <ModuleReportsScreen moduleKey="vendas" />;
+  }
+
+  if (slug === "pedidos") {
+    redirect("/vendas/nova?canal=whatsapp");
+  }
+
+  if (slug !== "historico") {
+    notFound();
   }
 
   return <ModuleChildScreen moduleKey="vendas" slug={slug} />;

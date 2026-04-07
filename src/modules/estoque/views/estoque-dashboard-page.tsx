@@ -179,7 +179,7 @@ export function EstoqueDashboardPage() {
     {
       label: "Novo pedido WhatsApp",
       description: "Registrar atendimento do canal digital.",
-      href: "/vendas/pedidos/novo",
+      href: "/vendas/nova?canal=whatsapp",
       icon: MessageCircleMore,
     },
     {

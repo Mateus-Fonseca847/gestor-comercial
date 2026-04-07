@@ -10,7 +10,6 @@ import { StatCard } from "@/components/page/stat-card";
 import { StatusBadge } from "@/components/page/status-badge";
 import { moduleNavigation } from "@/config/module-navigation";
 import {
-  CollectionPageConfig,
   moduleCollections,
   moduleDashboards,
   ModuleKey,
@@ -38,7 +37,7 @@ export function ModuleDashboardScreen({ moduleKey }: { moduleKey: ModuleKey }) {
         <article className="rounded-[30px] border border-[var(--color-border)] bg-[linear-gradient(135deg,#ffffff_0%,#edf4ff_62%,#d9e8ff_100%)] p-7">
           <div className="max-w-2xl space-y-5">
             <div className="inline-flex rounded-full border border-[var(--color-border)] bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-soft)]">
-              Painel da área
+              Visão rápida
             </div>
             <div className="space-y-2">
               <h2 className="text-3xl font-semibold tracking-tight text-[var(--color-primary)]">
@@ -64,10 +63,10 @@ export function ModuleDashboardScreen({ moduleKey }: { moduleKey: ModuleKey }) {
         <article className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_12px_30px_rgba(0,74,173,0.06)]">
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-[var(--color-primary)]">
-              Atalhos da rotina
+              Acessos rápidos
             </h2>
             <p className="text-sm text-[var(--color-text-soft)]">
-              Acesso rápido ao que você mais usa no dia.
+              O que mais ajuda na rotina da loja.
             </p>
           </div>
           <div className="space-y-3">
@@ -150,7 +149,7 @@ export function ModuleCollectionScreen({
               {config.title}
             </h2>
             <p className="text-sm text-[var(--color-text-soft)]">
-              Lista principal da área, pronta para acompanhar o dia da loja.
+              Consulta rápida para seguir o dia sem ruído.
             </p>
           </div>
           <StatusBadge variant="info">{config.rows.length} itens</StatusBadge>
@@ -162,7 +161,7 @@ export function ModuleCollectionScreen({
           emptyState={
             <EmptyState
               title={`Nada encontrado em ${config.title.toLowerCase()}`}
-              description="Ainda não há itens aqui. Assim que você começar a usar esta área, tudo aparece nesta lista."
+              description="Ainda não há itens nesta área."
               actionLabel={config.actionLabel}
             />
           }
@@ -198,9 +197,9 @@ export function ModuleReportsScreen({ moduleKey }: { moduleKey: ModuleKey }) {
       />
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <StatCard label="Relatórios prontos" value="5" description="Leituras rápidas para acompanhar a rotina da loja." />
-        <StatCard label="Atualização" value="15 min" description="Dados renovados para apoiar a operação do dia." />
-        <StatCard label="Exportação" value="PDF / XLS" description="Formatos previstos para compartilhar quando precisar." />
+        <StatCard label="Relatórios prontos" value="5" description="Leituras rápidas para acompanhar o dia." />
+        <StatCard label="Atualização" value="15 min" description="Dados renovados para apoiar decisões simples." />
+        <StatCard label="Exportação" value="PDF / XLS" description="Formatos práticos para conferência e envio." />
       </section>
 
       <ActionBar items={[{ label: "Gerar relatório" }, { label: "Exportar visão", tone: "neutral" }]} />
@@ -219,7 +218,7 @@ export function ModuleReportsScreen({ moduleKey }: { moduleKey: ModuleKey }) {
             Relatórios da área
           </h2>
           <p className="text-sm text-[var(--color-text-soft)]">
-            Leituras rápidas para vender melhor, comprar certo e manter a loja rodando.
+            Relatórios práticos para acompanhar o que entrou, saiu e está pendente.
           </p>
         </div>
 

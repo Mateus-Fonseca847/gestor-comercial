@@ -42,50 +42,50 @@ export type DashboardConfig = {
 export const moduleDashboards: Partial<Record<ModuleKey, DashboardConfig>> = {
   cadastros: {
     title: "Painel de clientes",
-    description: "Acompanhe clientes, contatos e atendimentos que fazem a loja vender mais no dia a dia.",
+    description: "Veja clientes recentes, relacionamento e próximos passos de venda sem complicação.",
     metrics: [
-      { label: "Clientes ativos", value: "318", description: "Base de clientes com compra recente ou atendimento em andamento." },
-      { label: "Contatos em retorno", value: "42", description: "Pessoas que pediram preço, prazo ou resposta no WhatsApp." },
-      { label: "Pendências do atendimento", value: "18", description: "Assuntos que ainda pedem retorno da equipe." },
+      { label: "Clientes ativos", value: "318", description: "Clientes com compra recente ou atendimento em andamento." },
+      { label: "Retornos do dia", value: "42", description: "Clientes que pedem resposta no WhatsApp ou no balcão." },
+      { label: "Pendências", value: "18", description: "Conversas e contatos que ainda pedem ação." },
     ],
-    spotlightTitle: "Clientes organizados para vender melhor e responder mais rápido.",
-    spotlightDescription: "Aqui fica a base comercial da loja: quem compra, quem pediu orçamento e quem precisa de um novo contato.",
+    spotlightTitle: "Clientes organizados para vender melhor todo dia.",
+    spotlightDescription: "A base de clientes precisa ser simples: quem comprou, quem pediu retorno e quem vale uma nova conversa.",
     highlights: [
-      "Clientes e contatos reunidos em um só lugar.",
-      "Equipe e pendências visíveis sem complicação.",
-      "Relatórios prontos para acompanhar a rotina.",
+      "Cadastro simples e direto.",
+      "Histórico comercial mais visível.",
+      "Acompanhamento fácil do relacionamento.",
     ],
   },
   vendas: {
     title: "Painel de vendas",
-    description: "Veja pedidos, orçamentos e últimas vendas de forma simples e rápida.",
+    description: "Acompanhe a operação comercial da loja e o que entrou por WhatsApp ou no balcão.",
     metrics: [
-      { label: "Pedidos do dia", value: "126", description: "Vendas em aberto, em separação ou aguardando confirmação." },
-      { label: "Orçamentos enviados", value: "34", description: "Conversas que ainda podem virar venda." },
-      { label: "Fechamento do mês", value: "28%", description: "Ritmo atual de conversão dos atendimentos mockados." },
+      { label: "Registros do dia", value: "126", description: "Vendas e pedidos lançados na rotina da loja." },
+      { label: "Aguardando confirmação", value: "34", description: "Pedidos que ainda pedem resposta do cliente." },
+      { label: "Concluídas", value: "92", description: "Registros já fechados no período atual." },
     ],
-    spotlightTitle: "Vendas com visão clara do balcão, do WhatsApp e do pós-venda.",
-    spotlightDescription: "Acompanhe o que entrou, o que está pendente e o que já virou faturamento sem cair em telas genéricas demais.",
+    spotlightTitle: "Um fluxo comercial só, com canal e status bem claros.",
+    spotlightDescription: "Loja e WhatsApp convivem no mesmo fluxo para a equipe registrar rápido e acompanhar melhor.",
     highlights: [
-      "Pedidos e orçamentos no mesmo fluxo.",
-      "Histórico pronto para consulta rápida.",
-      "Relatórios sempre à mão para fechar o dia.",
+      "Canal de origem visível em cada registro.",
+      "Histórico fácil de consultar.",
+      "Relatórios prontos para fechar o dia.",
     ],
   },
   financeiro: {
     title: "Painel financeiro",
-    description: "Acompanhe entradas, saídas e dinheiro em caixa sem complicação.",
+    description: "Veja caixa, contas e dinheiro da loja com leitura rápida e prática.",
     metrics: [
-      { label: "A receber", value: "R$ 184 mil", description: "Valores esperados das vendas e cobranças em aberto." },
-      { label: "A pagar", value: "R$ 96 mil", description: "Contas e compromissos que já estão no radar." },
-      { label: "Caixa previsto", value: "R$ 88 mil", description: "Projeção simples do saldo com base no cenário atual." },
+      { label: "A receber", value: "R$ 184 mil", description: "Entradas previstas das vendas e cobranças em aberto." },
+      { label: "A pagar", value: "R$ 96 mil", description: "Contas do período que a loja precisa cobrir." },
+      { label: "Caixa previsto", value: "R$ 88 mil", description: "Leitura simples do saldo projetado." },
     ],
-    spotlightTitle: "Financeiro claro para a loja saber o que entrou, saiu e falta receber.",
-    spotlightDescription: "O foco aqui é leitura rápida do caixa, das contas e do dinheiro que mantém a operação girando.",
+    spotlightTitle: "Financeiro enxuto para acompanhar o caixa da loja.",
+    spotlightDescription: "Entradas, saídas e contas visíveis sem transformar o financeiro em uma suíte pesada.",
     highlights: [
-      "Contas a pagar e a receber separadas por contexto.",
-      "Fluxo de caixa com leitura direta.",
-      "Painéis pensados para a rotina da loja.",
+      "Contas a pagar e receber em leitura direta.",
+      "Fluxo de caixa fácil de consultar.",
+      "Indicadores úteis para a rotina da loja.",
     ],
   },
   usuarios: {
@@ -142,10 +142,10 @@ export const moduleCollections: Partial<
   Record<ModuleKey, Record<string, CollectionPageConfig>>
 > = {
   cadastros: {
-    clientes: records("Clientes", "Acompanhe quem compra, quem volta e quem ainda está em atendimento.", "Novo cliente", ["Cliente", "Perfil", "Cidade", "Status"], [
-      { id: "C1", c1: "Acme Brasil", c2: "Compra recorrente", c3: "Campinas", status: "Ativo" },
-      { id: "C2", c1: "Nova Horizonte", c2: "Atacado", c3: "São Paulo", status: "Ativo" },
-      { id: "C3", c1: "Orbital Tech", c2: "Primeira compra", c3: "Curitiba", status: "Em análise" },
+    clientes: records("Clientes", "Acompanhe quem compra, quem pediu retorno e quem vale uma nova abordagem.", "Novo cliente", ["Cliente", "Perfil", "Cidade", "Status"], [
+      { id: "C1", c1: "Mariana Souza", c2: "Compra recorrente", c3: "Campinas", status: "Ativo" },
+      { id: "C2", c1: "Clube da Lari", c2: "Pedido WhatsApp", c3: "São Paulo", status: "Ativo" },
+      { id: "C3", c1: "Fernanda Lima", c2: "Primeira compra", c3: "Curitiba", status: "Em retorno" },
     ]),
     funcionarios: records("Equipe", "Veja quem atende, vende e mantém a rotina da loja funcionando.", "Novo colaborador", ["Nome", "Área", "Função", "Status"], [
       { id: "F1", c1: "Ana Ribeiro", c2: "Vendas", c3: "Atendimento", status: "Ativo" },
@@ -174,32 +174,27 @@ export const moduleCollections: Partial<
       { id: "O2", c1: "OR-202", c2: "Nova Horizonte", c3: "R$ 9.450", status: "Em revisão" },
       { id: "O3", c1: "OR-203", c2: "Prime Labs", c3: "R$ 31.800", status: "Aprovado" },
     ]),
-    historico: records("Últimas vendas", "Revise as vendas e negociações que já foram concluídas.", "Registrar venda", ["Registro", "Cliente", "Período", "Status"], [
-      { id: "H1", c1: "Renovação anual", c2: "Acme Brasil", c3: "Mar/2026", status: "Concluído" },
-      { id: "H2", c1: "Compra recorrente", c2: "Orbital Tech", c3: "Fev/2026", status: "Concluído" },
-      { id: "H3", c1: "Negociação encerrada", c2: "Prime Labs", c3: "Jan/2026", status: "Arquivado" },
+    historico: records("Últimas vendas", "Revise as vendas já fechadas e o canal de origem de cada uma.", "Registrar venda", ["Registro", "Cliente", "Período", "Status"], [
+      { id: "H1", c1: "Body splash + nécessaire", c2: "Mariana Souza", c3: "Hoje", status: "Concluído" },
+      { id: "H2", c1: "Pedido WhatsApp de presentes", c2: "Clube da Lari", c3: "Ontem", status: "Concluído" },
+      { id: "H3", c1: "Kit de acessórios", c2: "Fernanda Lima", c3: "Esta semana", status: "Concluído" },
     ]),
   },
   financeiro: {
-    "contas-pagar": records("Contas a pagar", "Controle o que a loja ainda precisa pagar nos próximos dias.", "Nova conta", ["Conta", "Fornecedor", "Vencimento", "Status"], [
-      { id: "CP1", c1: "Licença de software", c2: "Cloud Tools", c3: "12/04", status: "Em aberto" },
-      { id: "CP2", c1: "Frete interestadual", c2: "Log Express", c3: "15/04", status: "Aprovado" },
-      { id: "CP3", c1: "Compra de suprimentos", c2: "Office Plus", c3: "18/04", status: "Programado" },
+    "contas-pagar": records("Contas a pagar", "Controle o que a loja precisa pagar nos próximos dias.", "Nova conta", ["Conta", "Fornecedor", "Vencimento", "Status"], [
+      { id: "CP1", c1: "Reposição de bolsas", c2: "Atacado Bela Moda", c3: "12/04", status: "Em aberto" },
+      { id: "CP2", c1: "Conta de energia", c2: "CPFL", c3: "15/04", status: "Programado" },
+      { id: "CP3", c1: "Internet da loja", c2: "Vivo Empresas", c3: "18/04", status: "Programado" },
     ]),
-    "contas-receber": records("Contas a receber", "Acompanhe cobranças em aberto e valores que ainda vão entrar.", "Nova cobrança", ["Cobrança", "Cliente", "Vencimento", "Status"], [
-      { id: "CR1", c1: "Fatura abril", c2: "Acme Brasil", c3: "10/04", status: "Em aberto" },
-      { id: "CR2", c1: "Renovação anual", c2: "Orbital Tech", c3: "14/04", status: "Confirmado" },
-      { id: "CR3", c1: "Pedido especial", c2: "Prime Labs", c3: "20/04", status: "Atrasado" },
+    "contas-receber": records("Contas a receber", "Acompanhe o que ainda vai entrar no caixa da loja.", "Nova cobrança", ["Cobrança", "Cliente", "Vencimento", "Status"], [
+      { id: "CR1", c1: "Sinal de encomenda", c2: "Mariana Souza", c3: "10/04", status: "Em aberto" },
+      { id: "CR2", c1: "Pedido WhatsApp", c2: "Clube da Lari", c3: "14/04", status: "Confirmado" },
+      { id: "CR3", c1: "Venda parcelada", c2: "Fernanda Lima", c3: "20/04", status: "Atrasado" },
     ]),
     "fluxo-caixa": records("Fluxo de caixa", "Veja entradas e saídas para entender o caixa da loja no dia.", "Novo lançamento", ["Movimento", "Tipo", "Período", "Status"], [
-      { id: "FC1", c1: "Entrada comercial", c2: "Recebimento", c3: "Semana atual", status: "Projetado" },
-      { id: "FC2", c1: "Pagamento fornecedor", c2: "Saída", c3: "Semana atual", status: "Confirmado" },
-      { id: "FC3", c1: "Custo logístico", c2: "Saída", c3: "Próxima semana", status: "Previsto" },
-    ]),
-    dashboards: records("Painéis financeiros", "Acompanhe dinheiro em caixa, pagamentos e recebimentos de forma rápida.", "Novo painel", ["Painel", "Foco", "Atualização", "Status"], [
-      { id: "D1", c1: "Recebíveis", c2: "Entradas", c3: "15 min", status: "Ativo" },
-      { id: "D2", c1: "Pagamentos", c2: "Saídas", c3: "15 min", status: "Ativo" },
-      { id: "D3", c1: "Projeções", c2: "Caixa", c3: "1 hora", status: "Em revisão" },
+      { id: "FC1", c1: "Vendas da loja", c2: "Entrada", c3: "Hoje", status: "Confirmado" },
+      { id: "FC2", c1: "Pedidos WhatsApp", c2: "Entrada", c3: "Hoje", status: "Projetado" },
+      { id: "FC3", c1: "Pagamento fornecedor", c2: "Saída", c3: "Esta semana", status: "Previsto" },
     ]),
   },
   usuarios: {

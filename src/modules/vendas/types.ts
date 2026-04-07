@@ -1,6 +1,10 @@
 export type VendaCanal = "loja" | "whatsapp";
 
-export type VendaStatus = "rascunho" | "pendente" | "concluida";
+export type VendaStatus =
+  | "em_aberto"
+  | "aguardando_confirmacao"
+  | "concluida"
+  | "cancelada";
 
 export type VendaItem = {
   id: string;
@@ -39,4 +43,3 @@ export type SalvarVendaInput = {
     precoUnitario: number;
   }>;
 };
-
