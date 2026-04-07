@@ -1,0 +1,78 @@
+import type { PedidoCompra } from "@/modules/estoque/types";
+
+export const pedidosCompraMock: PedidoCompra[] = [
+  {
+    id: "pc-2026-0039",
+    numero: "PC-2026-0039",
+    fornecedorId: "for-tech-supply",
+    status: "parcialmente_recebido",
+    emitidoEm: "2026-03-29T14:00:00.000Z",
+    previsaoEntregaEm: "2026-04-03T18:00:00.000Z",
+    observacao: "Reposição de periféricos com entrega parcial autorizada.",
+    itens: [
+      {
+        id: "pci-0039-1",
+        produtoId: "prod-mouse-usb",
+        quantidadeSolicitada: 30,
+        quantidadeRecebida: 15,
+        unidadeMedida: "UN",
+        custoUnitario: { valor: 29.9, moeda: "BRL" },
+      },
+    ],
+    valorTotal: { valor: 897, moeda: "BRL" },
+    criadoEm: "2026-03-29T14:00:00.000Z",
+    atualizadoEm: "2026-04-04T09:50:00.000Z",
+  },
+  {
+    id: "pc-2026-0041",
+    numero: "PC-2026-0041",
+    fornecedorId: "for-distribuidora-prisma",
+    status: "aprovado",
+    emitidoEm: "2026-04-04T10:20:00.000Z",
+    previsaoEntregaEm: "2026-04-10T18:00:00.000Z",
+    observacao: "Compra emergencial para recomposição de consumíveis de impressão.",
+    itens: [
+      {
+        id: "pci-0041-1",
+        produtoId: "prod-toner-hp667",
+        quantidadeSolicitada: 40,
+        quantidadeRecebida: 0,
+        unidadeMedida: "UN",
+        custoUnitario: { valor: 66.5, moeda: "BRL" },
+      },
+      {
+        id: "pci-0041-2",
+        produtoId: "prod-monitor-24",
+        quantidadeSolicitada: 12,
+        quantidadeRecebida: 0,
+        unidadeMedida: "UN",
+        custoUnitario: { valor: 715, moeda: "BRL" },
+      },
+    ],
+    valorTotal: { valor: 11240, moeda: "BRL" },
+    criadoEm: "2026-04-04T10:20:00.000Z",
+    atualizadoEm: "2026-04-04T11:00:00.000Z",
+  },
+  {
+    id: "pc-2026-0035",
+    numero: "PC-2026-0035",
+    fornecedorId: "for-office-plus",
+    status: "recebido",
+    emitidoEm: "2026-03-31T09:00:00.000Z",
+    previsaoEntregaEm: "2026-04-02T17:00:00.000Z",
+    observacao: "Reposição de papelaria para abastecimento semanal.",
+    itens: [
+      {
+        id: "pci-0035-1",
+        produtoId: "prod-papel-a4",
+        quantidadeSolicitada: 80,
+        quantidadeRecebida: 80,
+        unidadeMedida: "CX",
+        custoUnitario: { valor: 24.9, moeda: "BRL" },
+      },
+    ],
+    valorTotal: { valor: 1992, moeda: "BRL" },
+    criadoEm: "2026-03-31T09:00:00.000Z",
+    atualizadoEm: "2026-04-02T10:15:00.000Z",
+  },
+];

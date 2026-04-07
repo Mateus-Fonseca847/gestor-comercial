@@ -1,0 +1,14 @@
+export { default as EstoqueDashboardPage } from "@/components/estoque/EstoqueDashboardPage";
+export { default as EstoqueProdutosPage } from "@/components/estoque/EstoqueProdutosPage";
+export { default as EstoqueMovimentacoesPage } from "@/components/estoque/EstoqueMovimentacoesPage";
+export { default as EstoqueCategoriasPage } from "@/components/estoque/EstoqueCategoriasPage";
+export { default as EstoqueFornecedoresPage } from "@/components/estoque/EstoqueFornecedoresPage";
+export { default as EstoqueComprasPage } from "@/components/estoque/EstoqueComprasPage";
+export { default as EstoqueDepositosPage } from "@/components/estoque/EstoqueDepositosPage";
+export { default as EstoqueEntradasPage } from "@/components/estoque/EstoqueEntradasPage";
+export { default as EstoqueInventarioPage } from "@/components/estoque/EstoqueInventarioPage";
+export { default as EstoqueTransferenciasPage } from "@/components/estoque/EstoqueTransferenciasPage";
+export { default as EstoqueProdutoNovoPage } from "@/components/estoque/EstoqueProdutoNovoPage";
+export { default as EstoqueProdutoDetailPage } from "@/components/estoque/EstoqueProdutoDetailPage";
+export { default as EstoqueProdutoEditarPage } from "@/components/estoque/EstoqueProdutoEditarPage";
+export { default as EstoqueRelatoriosPage } from "@/components/estoque/EstoqueRelatoriosPage";

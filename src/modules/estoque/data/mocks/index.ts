@@ -1,0 +1,10 @@
+export { alertasEstoqueMock } from "@/modules/estoque/data/mocks/alertas.mock";
+export { categoriasMock } from "@/modules/estoque/data/mocks/categorias.mock";
+export { depositosMock } from "@/modules/estoque/data/mocks/depositos.mock";
+export { entradasMercadoriaMock } from "@/modules/estoque/data/mocks/entradas.mock";
+export { fornecedoresMock } from "@/modules/estoque/data/mocks/fornecedores.mock";
+export { movimentacoesMock } from "@/modules/estoque/data/mocks/movimentacoes.mock";
+export { pedidosCompraMock } from "@/modules/estoque/data/mocks/pedidos-compra.mock";
+export { produtosMock, saldosProdutoMock } from "@/modules/estoque/data/mocks/produtos.mock";
+export { reservasMock } from "@/modules/estoque/data/mocks/reservas.mock";
+export { transferenciasMock } from "@/modules/estoque/data/mocks/transferencias.mock";

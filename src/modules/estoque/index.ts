@@ -1,0 +1,12 @@
+export { EstoqueDashboardPage } from "@/modules/estoque/views/estoque-dashboard-page";
+export { EstoqueFornecedoresPage } from "@/modules/estoque/views/estoque-fornecedores-page";
+export { EstoqueGenericSectionPage } from "@/modules/estoque/views/estoque-generic-section-page";
+export { EstoqueMovimentacoesPage } from "@/modules/estoque/views/estoque-movimentacoes-page";
+export { EstoqueProdutoDetailPage } from "@/modules/estoque/views/estoque-produto-detail-page";
+export { EstoqueProdutoEditarPage } from "@/modules/estoque/views/estoque-produto-editar-page";
+export { EstoqueProdutoNovoPage } from "@/modules/estoque/views/estoque-produto-novo-page";
+export { EstoqueProdutosPage } from "@/modules/estoque/views/estoque-produtos-page";
+export * from "@/modules/estoque/types";
+export * from "@/modules/estoque/data/mocks";
+export * from "@/modules/estoque/helpers";
+export * from "@/modules/estoque/store";
