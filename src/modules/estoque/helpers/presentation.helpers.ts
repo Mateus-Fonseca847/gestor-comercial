@@ -1,9 +1,10 @@
-import type { ProdutoEstoqueStatus } from "@/modules/estoque/types";
+﻿export type ProdutoEstoqueStatus = "saudavel" | "baixo" | "zerado" | "inativo";
 
 export function formatDateBR(value: string, withTime = false) {
-  return new Intl.DateTimeFormat("pt-BR", withTime
-    ? { dateStyle: "short", timeStyle: "short" }
-    : { dateStyle: "short" }).format(new Date(value));
+  return new Intl.DateTimeFormat(
+    "pt-BR",
+    withTime ? { dateStyle: "short", timeStyle: "short" } : { dateStyle: "short" },
+  ).format(new Date(value));
 }
 
 export function formatMovimentacaoTipo(tipo: string) {
@@ -20,6 +21,15 @@ export function formatMovimentacaoStatus(status: string) {
   if (status === "pendente") return "Pendente";
   if (status === "cancelada") return "Cancelada";
   return "Rascunho";
+}
+
+export function formatMovimentacaoOrigemOperacional(origem?: string) {
+  if (origem === "venda_loja") return "Venda na loja";
+  if (origem === "pedido_whatsapp") return "Pedido WhatsApp";
+  if (origem === "ajuste_interno") return "Ajuste interno";
+  if (origem === "reposicao_estoque") return "Reposição de estoque";
+  if (origem === "devolucao") return "Devolução";
+  return "Não informada";
 }
 
 export function formatFornecedorStatus(status: string) {

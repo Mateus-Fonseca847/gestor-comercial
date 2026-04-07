@@ -100,41 +100,54 @@ export function ModuleMegaMenu({
       >
         <div className="overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[0_18px_48px_rgba(0,74,173,0.12)]">
           <div className="p-3">
-            <div className="grid gap-1.5 md:grid-cols-2">
-              {data.sections.map((section) =>
-                section.items.map((item) => {
-                  const isCurrent = pathname === item.href;
+            <div className="space-y-3">
+              {data.sections.map((section) => (
+                <section
+                  key={section.title}
+                  className="rounded-[18px] border border-[var(--color-border)]/70 p-2"
+                >
+                  <div className="px-2 pb-2 pt-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-text-soft)]">
+                      {section.title}
+                    </p>
+                  </div>
 
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={[
-                        "group block rounded-[16px] px-3 py-3 transition-colors",
-                        isCurrent
-                          ? "bg-[var(--color-surface-alt)] text-[var(--color-primary)]"
-                          : "text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-primary)]",
-                      ].join(" ")}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">
-                            {item.title}
-                          </p>
-                          {item.badge ? (
-                            <span className="rounded-full bg-[#edf4ff] px-2 py-1 text-[11px] font-semibold text-[var(--color-primary)]">
-                              {item.badge}
+                  <div className="grid gap-1.5 md:grid-cols-2">
+                    {section.items.map((item) => {
+                      const isCurrent = pathname === item.href;
+
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={[
+                            "group block rounded-[16px] px-3 py-3 transition-colors",
+                            isCurrent
+                              ? "bg-[var(--color-surface-alt)] text-[var(--color-primary)]"
+                              : "text-[var(--color-text)] hover:bg-[var(--color-surface-alt)] hover:text-[var(--color-primary)]",
+                          ].join(" ")}
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium">
+                                {item.title}
+                              </p>
+                              {item.badge ? (
+                                <span className="rounded-full bg-[#edf4ff] px-2 py-1 text-[11px] font-semibold text-[var(--color-primary)]">
+                                  {item.badge}
+                                </span>
+                              ) : null}
+                            </div>
+                            <span className="text-[var(--color-text-soft)] transition-colors group-hover:text-[var(--color-primary)]">
+                              <ArrowRightIcon className="h-3.5 w-3.5" />
                             </span>
-                          ) : null}
-                        </div>
-                        <span className="text-[var(--color-text-soft)] transition-colors group-hover:text-[var(--color-primary)]">
-                          <ArrowRightIcon className="h-3.5 w-3.5" />
-                        </span>
-                      </div>
-                    </Link>
-                  );
-                }),
-              )}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
             </div>
           </div>
         </div>

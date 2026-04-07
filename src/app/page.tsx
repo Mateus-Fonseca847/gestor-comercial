@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { HomeOperationalPage } from "@/modules/shared/views/home-operational-page";
 
 export default function HomePage() {
-  redirect("/estoque");
+  return <HomeOperationalPage />;
 }

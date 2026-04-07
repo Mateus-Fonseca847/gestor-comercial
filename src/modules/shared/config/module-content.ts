@@ -1,4 +1,4 @@
-export type ModuleKey =
+﻿export type ModuleKey =
   | "estoque"
   | "cadastros"
   | "vendas"
@@ -41,99 +41,99 @@ export type DashboardConfig = {
 
 export const moduleDashboards: Partial<Record<ModuleKey, DashboardConfig>> = {
   cadastros: {
-    title: "Dashboard de cadastros",
-    description: "Centralize entidades comerciais, acompanhe base ativa e chegue rapidamente aos registros estratégicos.",
+    title: "Painel de clientes",
+    description: "Acompanhe clientes, contatos e atendimentos que fazem a loja vender mais no dia a dia.",
     metrics: [
-      { label: "Clientes ativos", value: "318", description: "Base comercial disponível para operação e relacionamento." },
-      { label: "Leads em triagem", value: "42", description: "Oportunidades aguardando qualificação da equipe." },
-      { label: "Tickets abertos", value: "18", description: "Solicitações em andamento com acompanhamento interno." },
+      { label: "Clientes ativos", value: "318", description: "Base de clientes com compra recente ou atendimento em andamento." },
+      { label: "Contatos em retorno", value: "42", description: "Pessoas que pediram preço, prazo ou resposta no WhatsApp." },
+      { label: "Pendências do atendimento", value: "18", description: "Assuntos que ainda pedem retorno da equipe." },
     ],
-    spotlightTitle: "Cadastros organizados para acelerar operação e atendimento.",
-    spotlightDescription: "Use este módulo para manter a base principal do sistema íntegra e acessível, reduzindo retrabalho entre áreas.",
+    spotlightTitle: "Clientes organizados para vender melhor e responder mais rápido.",
+    spotlightDescription: "Aqui fica a base comercial da loja: quem compra, quem pediu orçamento e quem precisa de um novo contato.",
     highlights: [
-      "Clientes e leads em um fluxo centralizado.",
-      "Funcionários e tickets com leitura operacional clara.",
-      "Acesso rápido aos relatórios do módulo.",
+      "Clientes e contatos reunidos em um só lugar.",
+      "Equipe e pendências visíveis sem complicação.",
+      "Relatórios prontos para acompanhar a rotina.",
     ],
   },
   vendas: {
-    title: "Dashboard de vendas",
-    description: "Monitore pedidos, propostas e histórico comercial em um fluxo de navegação objetivo.",
+    title: "Painel de vendas",
+    description: "Veja pedidos, orçamentos e últimas vendas de forma simples e rápida.",
     metrics: [
-      { label: "Pedidos ativos", value: "126", description: "Negociações em processamento ou aguardando conclusão." },
-      { label: "Orçamentos abertos", value: "34", description: "Propostas ainda em avaliação pelo cliente." },
-      { label: "Conversão mensal", value: "28%", description: "Taxa consolidada dos mocks comerciais atuais." },
+      { label: "Pedidos do dia", value: "126", description: "Vendas em aberto, em separação ou aguardando confirmação." },
+      { label: "Orçamentos enviados", value: "34", description: "Conversas que ainda podem virar venda." },
+      { label: "Fechamento do mês", value: "28%", description: "Ritmo atual de conversão dos atendimentos mockados." },
     ],
-    spotlightTitle: "Vendas com visão operacional e resposta rápida.",
-    spotlightDescription: "Concentre pipeline, histórico e materiais de acompanhamento em um módulo limpo e preparado para expansão.",
+    spotlightTitle: "Vendas com visão clara do balcão, do WhatsApp e do pós-venda.",
+    spotlightDescription: "Acompanhe o que entrou, o que está pendente e o que já virou faturamento sem cair em telas genéricas demais.",
     highlights: [
-      "Pedidos e orçamentos conectados ao mesmo fluxo.",
-      "Histórico separado para consulta rápida.",
-      "Relatórios sempre acessíveis pelo menu do módulo.",
+      "Pedidos e orçamentos no mesmo fluxo.",
+      "Histórico pronto para consulta rápida.",
+      "Relatórios sempre à mão para fechar o dia.",
     ],
   },
   financeiro: {
-    title: "Dashboard financeiro",
-    description: "Conecte contas, fluxo de caixa e análise gerencial em um centro financeiro claro e moderno.",
+    title: "Painel financeiro",
+    description: "Acompanhe entradas, saídas e dinheiro em caixa sem complicação.",
     metrics: [
-      { label: "Receber no mês", value: "R$ 184 mil", description: "Títulos simulados em aberto dentro do período atual." },
-      { label: "Pagar no mês", value: "R$ 96 mil", description: "Compromissos previstos para liquidação financeira." },
-      { label: "Saldo projetado", value: "R$ 88 mil", description: "Projeção líquida com base nas entradas e saídas mockadas." },
+      { label: "A receber", value: "R$ 184 mil", description: "Valores esperados das vendas e cobranças em aberto." },
+      { label: "A pagar", value: "R$ 96 mil", description: "Contas e compromissos que já estão no radar." },
+      { label: "Caixa previsto", value: "R$ 88 mil", description: "Projeção simples do saldo com base no cenário atual." },
     ],
-    spotlightTitle: "Finanças operadas com mais previsibilidade e menos ruído.",
-    spotlightDescription: "O módulo consolida compromissos, indicadores e visão de caixa em uma navegação objetiva para decisões rápidas.",
+    spotlightTitle: "Financeiro claro para a loja saber o que entrou, saiu e falta receber.",
+    spotlightDescription: "O foco aqui é leitura rápida do caixa, das contas e do dinheiro que mantém a operação girando.",
     highlights: [
       "Contas a pagar e a receber separadas por contexto.",
-      "Fluxo de caixa com leitura dedicada.",
-      "Dashboards e relatórios disponíveis no mesmo ecossistema.",
+      "Fluxo de caixa com leitura direta.",
+      "Painéis pensados para a rotina da loja.",
     ],
   },
   usuarios: {
-    title: "Dashboard de usuários",
-    description: "Organize acesso, perfis e auditoria de uso com uma navegação preparada para governança.",
+    title: "Painel de usuários",
+    description: "Organize acessos da equipe e acompanhe usos importantes do sistema.",
     metrics: [
-      { label: "Usuários ativos", value: "64", description: "Contas com uso recente no ambiente administrativo." },
-      { label: "Perfis configurados", value: "9", description: "Estruturas de acesso definidas para as áreas internas." },
-      { label: "Eventos de log", value: "182", description: "Registros recentes de troca e atividade no sistema." },
+      { label: "Usuários ativos", value: "64", description: "Pessoas com uso recente no sistema." },
+      { label: "Perfis criados", value: "9", description: "Níveis de acesso definidos para cada função." },
+      { label: "Eventos recentes", value: "182", description: "Registros das últimas ações feitas no sistema." },
     ],
-    spotlightTitle: "Governança simples para times e permissões.",
-    spotlightDescription: "Concentre perfis, auditoria e gestão de troca de usuários sem espalhar a administração do ambiente.",
+    spotlightTitle: "Acessos simples para cada pessoa usar só o que precisa.",
+    spotlightDescription: "Gerencie perfis, trocas de usuário e rastros de uso sem deixar a administração pesada demais.",
     highlights: [
-      "Perfis separados por responsabilidade.",
+      "Perfis separados por função.",
       "Troca de usuário com acesso rápido.",
-      "Logs e relatórios acessíveis pelo mesmo padrão.",
+      "Histórico recente para conferência.",
     ],
   },
   logistica: {
-    title: "Dashboard de logística",
-    description: "Acompanhe rastreamento, fretes e despachos com foco em execução e previsibilidade operacional.",
+    title: "Painel de logística",
+    description: "Veja entregas, fretes e saídas de mercadoria sem perder tempo.",
     metrics: [
-      { label: "Entregas ativas", value: "52", description: "Processos logísticos em curso no período atual." },
-      { label: "Fretes cotados", value: "14", description: "Cotações recentes em avaliação operacional." },
-      { label: "Despachos pendentes", value: "7", description: "Saídas aguardando conferência ou expedição." },
+      { label: "Entregas em andamento", value: "52", description: "Pedidos que já saíram ou estão a caminho." },
+      { label: "Fretes em cotação", value: "14", description: "Cotações abertas para escolher o melhor envio." },
+      { label: "Saídas pendentes", value: "7", description: "Volumes que ainda precisam ser conferidos ou despachados." },
     ],
-    spotlightTitle: "Logística com navegação clara entre despacho, frete e rastreamento.",
-    spotlightDescription: "O módulo foi organizado para leitura rápida dos fluxos operacionais sem excesso de camadas visuais.",
+    spotlightTitle: "Logística organizada para a mercadoria sair no tempo certo.",
+    spotlightDescription: "Acompanhe expedição, fretes e rastreio de forma objetiva, com foco no que precisa andar hoje.",
     highlights: [
-      "Rastreamento e despacho em rotas separadas.",
-      "Fretes visíveis com contexto imediato.",
-      "Relatórios consolidados para gestão logística.",
+      "Rastreamento e despacho em fluxos separados.",
+      "Fretes com leitura rápida do status.",
+      "Relatórios prontos para acompanhar entregas.",
     ],
   },
   configuracoes: {
-    title: "Dashboard de configurações",
-    description: "Centralize parâmetros do ambiente, integrações e suporte da operação em uma navegação clara.",
+    title: "Configurações",
+    description: "Ajuste dados da loja, integrações e preferências do sistema em um só lugar.",
     metrics: [
-      { label: "Parâmetros ativos", value: "38", description: "Configurações operacionais vigentes no ambiente." },
-      { label: "Integrações conectadas", value: "6", description: "Serviços externos já simulados na aplicação." },
-      { label: "Itens de ajuda", value: "24", description: "Conteúdos base para suporte e orientação interna." },
+      { label: "Ajustes ativos", value: "38", description: "Configurações em uso na operação atual." },
+      { label: "Integrações ligadas", value: "6", description: "Conexões externas já simuladas no sistema." },
+      { label: "Ajuda disponível", value: "24", description: "Guias e conteúdos de apoio para a equipe." },
     ],
-    spotlightTitle: "Configurações organizadas para administrar o sistema com segurança.",
-    spotlightDescription: "Use este espaço para concentrar ajustes institucionais, ajuda e integrações sem quebrar a consistência visual do produto.",
+    spotlightTitle: "Tudo que ajusta a loja fica concentrado aqui.",
+    spotlightDescription: "Centralize dados da empresa, integrações e materiais de apoio sem espalhar configurações pelo sistema.",
     highlights: [
-      "Empresa, ajuda e integrações em fluxos separados.",
-      "Relatórios dedicados à camada administrativa.",
-      "Estrutura pronta para parametrização futura.",
+      "Dados da loja em um fluxo único.",
+      "Integrações e ajuda em áreas separadas.",
+      "Estrutura pronta para crescer depois.",
     ],
   },
 };
@@ -142,112 +142,112 @@ export const moduleCollections: Partial<
   Record<ModuleKey, Record<string, CollectionPageConfig>>
 > = {
   cadastros: {
-    clientes: records("Clientes", "Gerencie a carteira comercial e a organização dos registros principais de relacionamento.", "Novo cliente", ["Cliente", "Segmento", "Cidade", "Status"], [
-      { id: "C1", c1: "Acme Brasil", c2: "Indústria", c3: "Campinas", status: "Ativo" },
-      { id: "C2", c1: "Nova Horizonte", c2: "Serviços", c3: "São Paulo", status: "Ativo" },
-      { id: "C3", c1: "Orbital Tech", c2: "Tecnologia", c3: "Curitiba", status: "Em análise" },
+    clientes: records("Clientes", "Acompanhe quem compra, quem volta e quem ainda está em atendimento.", "Novo cliente", ["Cliente", "Perfil", "Cidade", "Status"], [
+      { id: "C1", c1: "Acme Brasil", c2: "Compra recorrente", c3: "Campinas", status: "Ativo" },
+      { id: "C2", c1: "Nova Horizonte", c2: "Atacado", c3: "São Paulo", status: "Ativo" },
+      { id: "C3", c1: "Orbital Tech", c2: "Primeira compra", c3: "Curitiba", status: "Em análise" },
     ]),
-    funcionarios: records("Funcionários", "Estruture equipes, funções e vínculos operacionais do sistema.", "Novo funcionário", ["Nome", "Área", "Cargo", "Status"], [
-      { id: "F1", c1: "Ana Ribeiro", c2: "Comercial", c3: "Executiva de contas", status: "Ativo" },
+    funcionarios: records("Equipe", "Veja quem atende, vende e mantém a rotina da loja funcionando.", "Novo colaborador", ["Nome", "Área", "Função", "Status"], [
+      { id: "F1", c1: "Ana Ribeiro", c2: "Vendas", c3: "Atendimento", status: "Ativo" },
       { id: "F2", c1: "Carlos Mota", c2: "Financeiro", c3: "Analista", status: "Ativo" },
-      { id: "F3", c1: "Luiza Prado", c2: "Logística", c3: "Coordenação", status: "Férias" },
+      { id: "F3", c1: "Luiza Prado", c2: "Estoque", c3: "Coordenação", status: "Férias" },
     ]),
-    leads: records("Leads", "Acompanhe oportunidades em qualificação e priorize contatos comerciais.", "Novo lead", ["Lead", "Origem", "Responsável", "Status"], [
+    leads: records("Contatos", "Organize novos contatos e quem ainda pode virar venda.", "Novo contato", ["Contato", "Origem", "Responsável", "Status"], [
       { id: "L1", c1: "Grupo Delta", c2: "Site", c3: "Equipe SDR", status: "Novo" },
       { id: "L2", c1: "Mercado Alfa", c2: "Campanha", c3: "Juliana", status: "Qualificando" },
       { id: "L3", c1: "Prime Labs", c2: "Indicação", c3: "Rafael", status: "Proposta" },
     ]),
-    tickets: records("Tickets", "Organize solicitações internas e demandas ligadas ao cadastro das entidades.", "Novo ticket", ["Ticket", "Categoria", "Responsável", "Status"], [
+    tickets: records("Pendências", "Acompanhe pedidos internos e ajustes que ainda pedem atenção.", "Nova pendência", ["Assunto", "Tipo", "Responsável", "Status"], [
       { id: "T1", c1: "Ajuste de documento", c2: "Cliente", c3: "Backoffice", status: "Em aberto" },
-      { id: "T2", c1: "Vincular funcionário", c2: "RH", c3: "Operações", status: "Em andamento" },
-      { id: "T3", c1: "Lead duplicado", c2: "Leads", c3: "Comercial", status: "Concluído" },
+      { id: "T2", c1: "Vincular colaborador", c2: "Equipe", c3: "Operações", status: "Em andamento" },
+      { id: "T3", c1: "Contato duplicado", c2: "Cadastro", c3: "Comercial", status: "Concluído" },
     ]),
   },
   vendas: {
-    pedidos: records("Pedidos", "Acompanhe pedidos ativos e a evolução operacional das vendas.", "Novo pedido", ["Pedido", "Cliente", "Valor", "Status"], [
+    pedidos: records("Pedidos", "Acompanhe as vendas em andamento e o que falta separar, cobrar ou entregar.", "Novo pedido", ["Pedido", "Cliente", "Valor", "Status"], [
       { id: "P1", c1: "#948", c2: "Acme Brasil", c3: "R$ 18.400", status: "Aprovado" },
       { id: "P2", c1: "#952", c2: "Orbital Tech", c3: "R$ 7.920", status: "Separação" },
       { id: "P3", c1: "#956", c2: "Mercado Alfa", c3: "R$ 4.300", status: "Pendente" },
     ]),
-    orcamentos: records("Orçamentos", "Conduza propostas comerciais com leitura clara por estágio.", "Novo orçamento", ["Orçamento", "Cliente", "Valor", "Status"], [
+    orcamentos: records("Orçamentos", "Veja propostas abertas e acompanhe o que ainda pode virar venda.", "Novo orçamento", ["Orçamento", "Cliente", "Valor", "Status"], [
       { id: "O1", c1: "OR-201", c2: "Grupo Delta", c3: "R$ 22.100", status: "Enviado" },
       { id: "O2", c1: "OR-202", c2: "Nova Horizonte", c3: "R$ 9.450", status: "Em revisão" },
       { id: "O3", c1: "OR-203", c2: "Prime Labs", c3: "R$ 31.800", status: "Aprovado" },
     ]),
-    historico: records("Histórico de vendas", "Consulte negociações finalizadas e eventos relevantes do módulo comercial.", "Registrar histórico", ["Registro", "Cliente", "Período", "Status"], [
+    historico: records("Últimas vendas", "Revise as vendas e negociações que já foram concluídas.", "Registrar venda", ["Registro", "Cliente", "Período", "Status"], [
       { id: "H1", c1: "Renovação anual", c2: "Acme Brasil", c3: "Mar/2026", status: "Concluído" },
       { id: "H2", c1: "Compra recorrente", c2: "Orbital Tech", c3: "Fev/2026", status: "Concluído" },
       { id: "H3", c1: "Negociação encerrada", c2: "Prime Labs", c3: "Jan/2026", status: "Arquivado" },
     ]),
   },
   financeiro: {
-    "contas-pagar": records("Contas a pagar", "Gerencie obrigações e compromissos financeiros previstos para liquidação.", "Nova conta", ["Título", "Fornecedor", "Vencimento", "Status"], [
+    "contas-pagar": records("Contas a pagar", "Controle o que a loja ainda precisa pagar nos próximos dias.", "Nova conta", ["Conta", "Fornecedor", "Vencimento", "Status"], [
       { id: "CP1", c1: "Licença de software", c2: "Cloud Tools", c3: "12/04", status: "Em aberto" },
       { id: "CP2", c1: "Frete interestadual", c2: "Log Express", c3: "15/04", status: "Aprovado" },
       { id: "CP3", c1: "Compra de suprimentos", c2: "Office Plus", c3: "18/04", status: "Programado" },
     ]),
-    "contas-receber": records("Contas a receber", "Acompanhe entradas previstas e títulos vinculados ao comercial.", "Nova cobrança", ["Título", "Cliente", "Vencimento", "Status"], [
+    "contas-receber": records("Contas a receber", "Acompanhe cobranças em aberto e valores que ainda vão entrar.", "Nova cobrança", ["Cobrança", "Cliente", "Vencimento", "Status"], [
       { id: "CR1", c1: "Fatura abril", c2: "Acme Brasil", c3: "10/04", status: "Em aberto" },
       { id: "CR2", c1: "Renovação anual", c2: "Orbital Tech", c3: "14/04", status: "Confirmado" },
       { id: "CR3", c1: "Pedido especial", c2: "Prime Labs", c3: "20/04", status: "Atrasado" },
     ]),
-    "fluxo-caixa": records("Fluxo de caixa", "Visualize entradas e saídas consolidadas para leitura rápida do período.", "Novo lançamento", ["Movimento", "Tipo", "Período", "Status"], [
+    "fluxo-caixa": records("Fluxo de caixa", "Veja entradas e saídas para entender o caixa da loja no dia.", "Novo lançamento", ["Movimento", "Tipo", "Período", "Status"], [
       { id: "FC1", c1: "Entrada comercial", c2: "Recebimento", c3: "Semana atual", status: "Projetado" },
       { id: "FC2", c1: "Pagamento fornecedor", c2: "Saída", c3: "Semana atual", status: "Confirmado" },
       { id: "FC3", c1: "Custo logístico", c2: "Saída", c3: "Próxima semana", status: "Previsto" },
     ]),
-    dashboards: records("Dashboards financeiros", "Agrupe leituras executivas e painéis operacionais do módulo.", "Novo dashboard", ["Painel", "Foco", "Atualização", "Status"], [
+    dashboards: records("Painéis financeiros", "Acompanhe dinheiro em caixa, pagamentos e recebimentos de forma rápida.", "Novo painel", ["Painel", "Foco", "Atualização", "Status"], [
       { id: "D1", c1: "Recebíveis", c2: "Entradas", c3: "15 min", status: "Ativo" },
       { id: "D2", c1: "Pagamentos", c2: "Saídas", c3: "15 min", status: "Ativo" },
       { id: "D3", c1: "Projeções", c2: "Caixa", c3: "1 hora", status: "Em revisão" },
     ]),
   },
   usuarios: {
-    perfis: records("Perfis de acesso", "Gerencie grupos de permissão e responsabilidades por área.", "Novo perfil", ["Perfil", "Área", "Escopo", "Status"], [
-      { id: "U1", c1: "Administradores", c2: "Diretoria", c3: "Total", status: "Ativo" },
+    perfis: records("Perfis de acesso", "Defina o que cada pessoa da equipe pode ver e fazer.", "Novo perfil", ["Perfil", "Área", "Escopo", "Status"], [
+      { id: "U1", c1: "Administradores", c2: "Direção", c3: "Total", status: "Ativo" },
       { id: "U2", c1: "Operações", c2: "Estoque", c3: "Parcial", status: "Ativo" },
       { id: "U3", c1: "Financeiro", c2: "Financeiro", c3: "Restrito", status: "Em revisão" },
     ]),
-    "trocar-usuario": records("Troca de usuário", "Acesse sessões recentes e simulações de contexto para suporte operacional.", "Trocar usuário", ["Usuário", "Perfil", "Último acesso", "Status"], [
+    "trocar-usuario": records("Troca de usuário", "Acesse perfis recentes para suporte ou conferência rápida.", "Trocar usuário", ["Usuário", "Perfil", "Último acesso", "Status"], [
       { id: "TU1", c1: "Mariana Costa", c2: "Administradores", c3: "Hoje 09:18", status: "Online" },
       { id: "TU2", c1: "Ricardo Alves", c2: "Operações", c3: "Hoje 08:41", status: "Disponível" },
       { id: "TU3", c1: "Paula Lima", c2: "Financeiro", c3: "Ontem 17:20", status: "Inativo" },
     ]),
-    logs: records("Logs de atividade", "Consulte eventos de acesso e movimentações relevantes do ambiente administrativo.", "Exportar logs", ["Evento", "Usuário", "Momento", "Status"], [
+    logs: records("Histórico de uso", "Veja acessos e ações recentes feitas no sistema.", "Exportar histórico", ["Evento", "Usuário", "Momento", "Status"], [
       { id: "LG1", c1: "Login validado", c2: "Mariana Costa", c3: "Hoje 09:18", status: "Sucesso" },
       { id: "LG2", c1: "Troca de perfil", c2: "Ricardo Alves", c3: "Hoje 08:54", status: "Auditado" },
       { id: "LG3", c1: "Tentativa bloqueada", c2: "Conta externa", c3: "Ontem 22:14", status: "Alerta" },
     ]),
   },
   logistica: {
-    rastreamento: records("Rastreamento", "Monitore entregas, checkpoints e sinais de atraso logístico.", "Novo rastreio", ["Carga", "Destino", "Previsão", "Status"], [
+    rastreamento: records("Rastreamento", "Acompanhe entregas e veja rápido o que está em rota ou atrasado.", "Novo rastreio", ["Carga", "Destino", "Previsão", "Status"], [
       { id: "R1", c1: "Pedido #948", c2: "Campinas", c3: "Hoje 14:30", status: "Em rota" },
       { id: "R2", c1: "Pedido #952", c2: "Sorocaba", c3: "Hoje 16:10", status: "Em rota" },
       { id: "R3", c1: "Pedido #956", c2: "Curitiba", c3: "Amanhã 11:00", status: "Atraso" },
     ]),
-    fretes: records("Fretes", "Gerencie cotações e contratos ligados ao deslocamento de mercadorias.", "Novo frete", ["Frete", "Transportadora", "Faixa", "Status"], [
+    fretes: records("Fretes", "Compare fretes e escolha o envio mais viável para a operação.", "Novo frete", ["Frete", "Transportadora", "Faixa", "Status"], [
       { id: "FR1", c1: "Cotação Sul", c2: "Log Express", c3: "R$ 1.800", status: "Em cotação" },
       { id: "FR2", c1: "Contrato SP", c2: "Rápido Cargo", c3: "R$ 980", status: "Ativo" },
       { id: "FR3", c1: "Urgência interior", c2: "Via Prime", c3: "R$ 1.250", status: "Aprovado" },
     ]),
-    despachos: records("Despachos", "Acompanhe preparação, conferência e saída das cargas.", "Novo despacho", ["Despacho", "Origem", "Janela", "Status"], [
+    despachos: records("Despachos", "Veja o que está separando, conferindo e saindo para entrega.", "Novo despacho", ["Despacho", "Origem", "Janela", "Status"], [
       { id: "D1", c1: "EXP-302", c2: "CD principal", c3: "Hoje 13:00", status: "Separando" },
       { id: "D2", c1: "EXP-304", c2: "CD principal", c3: "Hoje 15:00", status: "Conferência" },
       { id: "D3", c1: "EXP-305", c2: "Filial Sul", c3: "Amanhã 09:00", status: "Agendado" },
     ]),
   },
   configuracoes: {
-    empresa: records("Empresa", "Consolide dados institucionais e parâmetros principais do ambiente.", "Editar empresa", ["Parâmetro", "Valor", "Escopo", "Status"], [
+    empresa: records("Dados da loja", "Concentre os dados principais da empresa e preferências do sistema.", "Editar dados", ["Configuração", "Valor", "Escopo", "Status"], [
       { id: "E1", c1: "Razão social", c2: "Meu Negócio LTDA", c3: "Institucional", status: "Ativo" },
       { id: "E2", c1: "Fuso operacional", c2: "America/Sao_Paulo", c3: "Sistema", status: "Ativo" },
       { id: "E3", c1: "Moeda padrão", c2: "BRL", c3: "Financeiro", status: "Ativo" },
     ]),
-    ajuda: records("Ajuda", "Organize materiais de suporte e orientação operacional para o time.", "Novo conteúdo", ["Conteúdo", "Tipo", "Atualização", "Status"], [
+    ajuda: records("Ajuda", "Reúna orientações rápidas para a equipe usar o sistema no dia a dia.", "Novo conteúdo", ["Conteúdo", "Tipo", "Atualização", "Status"], [
       { id: "A1", c1: "Fluxo de estoque", c2: "Guia", c3: "Hoje", status: "Publicado" },
       { id: "A2", c1: "Onboarding comercial", c2: "Checklist", c3: "Ontem", status: "Publicado" },
       { id: "A3", c1: "FAQ financeiro", c2: "Base de conhecimento", c3: "3 dias", status: "Em revisão" },
     ]),
-    integracoes: records("Integrações", "Monitore conexões externas e o estado operacional de cada integração.", "Nova integração", ["Integração", "Canal", "Último sync", "Status"], [
+    integracoes: records("Integrações", "Veja conexões externas e descubra rápido o que precisa de atenção.", "Nova integração", ["Integração", "Canal", "Último sync", "Status"], [
       { id: "I1", c1: "ERP legado", c2: "API", c3: "10 min", status: "Conectado" },
       { id: "I2", c1: "Transportadora", c2: "Webhook", c3: "32 min", status: "Atenção" },
       { id: "I3", c1: "Financeiro externo", c2: "API", c3: "2 horas", status: "Em teste" },
@@ -267,9 +267,9 @@ function records(
     description,
     actionLabel,
     metrics: [
-      { label: "Itens monitorados", value: String(rows.length), description: "Registros mockados visíveis na visão principal." },
-      { label: "Atualização", value: "Hoje", description: "Conteúdo base alinhado ao módulo selecionado." },
-      { label: "Próxima ação", value: actionLabel, description: "CTA principal sugerida para o fluxo atual." },
+      { label: "Itens na tela", value: String(rows.length), description: "Registros visíveis nesta área." },
+      { label: "Atualização", value: "Hoje", description: "Leitura atual desta área." },
+      { label: "Próxima ação", value: actionLabel, description: "Ação mais comum para seguir a rotina." },
     ],
     filters: {
       placeholder: `Buscar em ${title.toLowerCase()}`,

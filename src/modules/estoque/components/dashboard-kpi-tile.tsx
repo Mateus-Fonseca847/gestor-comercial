@@ -29,7 +29,7 @@ export function DashboardKpiTile({
   return (
     <article
       className={[
-        "rounded-[24px] border bg-[var(--color-surface)] p-6 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "rounded-[26px] border bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-6 shadow-[0_12px_28px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.08)]",
         tone === "danger"
           ? "border-red-200"
           : tone === "warning"
@@ -41,7 +41,9 @@ export function DashboardKpiTile({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-4">
-          <p className="text-sm font-medium text-[var(--color-text-soft)]">{label}</p>
+          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[var(--color-text-soft)]">
+            {label}
+          </p>
           <p className="text-[1.75rem] font-bold tracking-tight text-[var(--color-text)]">
             {value}
           </p>
@@ -65,12 +67,12 @@ export function DashboardKpiTile({
         </div>
         <div
           className={[
-            "flex h-11 w-11 items-center justify-center rounded-2xl",
+            "flex h-11 w-11 items-center justify-center rounded-[18px] border",
             tone === "danger"
-              ? "bg-red-50 text-red-700"
+              ? "border-red-100 bg-red-50 text-red-700"
               : tone === "warning"
-                ? "bg-yellow-50 text-yellow-700"
-                : "bg-[rgba(0,74,173,0.08)] text-[var(--color-primary)]",
+                ? "border-yellow-100 bg-yellow-50 text-yellow-700"
+                : "border-[rgba(0,74,173,0.08)] bg-[rgba(0,74,173,0.06)] text-[var(--color-primary)]",
           ].join(" ")}
         >
           <Package className="h-5 w-5" />

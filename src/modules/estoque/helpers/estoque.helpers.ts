@@ -1,6 +1,7 @@
 import type { AlertaEstoque, EntityId, Produto, ProdutoSaldo } from "@/modules/estoque/types";
 
 export type ProdutoEstoqueStatus = "saudavel" | "baixo" | "zerado" | "inativo";
+export type ReposicaoUrgencia = "critica" | "alta" | "moderada";
 
 type RecalcularAlertasParams = {
   produtos: Produto[];
@@ -122,4 +123,37 @@ export function calcularValorTotalEmEstoque(
 
     return total + saldo.quantidadeFisica * custoUnitario;
   }, 0);
+}
+
+export function calcularSugestaoReposicao(
+  produto: Produto,
+  saldos: ProdutoSaldo[],
+): number {
+  const disponivel = calcularEstoqueDisponivel(produto.id, saldos);
+  const alvo = produto.pontoReposicao ?? produto.estoqueMinimo * 2;
+  return Math.max(alvo - disponivel, 0);
+}
+
+export function calcularUrgenciaReposicao(
+  produto: Produto,
+  saldos: ProdutoSaldo[],
+): ReposicaoUrgencia | null {
+  const status = calcularStatusProduto(produto, saldos);
+
+  if (status === "inativo" || status === "saudavel") {
+    return null;
+  }
+
+  if (status === "zerado") {
+    return "critica";
+  }
+
+  const disponivel = calcularEstoqueDisponivel(produto.id, saldos);
+  const minimo = Math.max(produto.estoqueMinimo, 1);
+
+  if (disponivel <= Math.ceil(minimo / 2)) {
+    return "alta";
+  }
+
+  return "moderada";
 }

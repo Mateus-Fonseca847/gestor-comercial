@@ -1,10 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ActionBar } from "@/components/page/action-bar";
 import { EmptyState } from "@/components/page/empty-state";
 import { FilterBar } from "@/components/page/filter-bar";
 import { PageContainer } from "@/components/page/page-container";
@@ -16,10 +15,12 @@ import { FormSectionCard } from "@/modules/estoque/components/form-section-card"
 import { useFeedback } from "@/modules/estoque/components/use-feedback";
 import {
   formatDateBR,
+  formatMovimentacaoOrigemOperacional,
   formatMovimentacaoStatus,
   formatMovimentacaoTipo,
 } from "@/modules/estoque/helpers";
 import { useEstoqueEntityList, useEstoqueStore } from "@/modules/estoque/store";
+import type { MovimentacaoOrigemOperacional } from "@/modules/estoque/types";
 
 type MovimentacaoRow = {
   id: string;
@@ -28,117 +29,130 @@ type MovimentacaoRow = {
   data: string;
   tipo: string;
   status: string;
+  origemOperacional: string;
 };
 
-const entradaManualSchema = z.object({
+const origemOperacionalOptions: Array<{
+  value: MovimentacaoOrigemOperacional;
+  label: string;
+}> = [
+  { value: "venda_loja", label: "Venda na loja" },
+  { value: "pedido_whatsapp", label: "Pedido via WhatsApp" },
+  { value: "ajuste_interno", label: "Ajuste interno" },
+  { value: "reposicao_estoque", label: "Reposição de estoque" },
+  { value: "devolucao", label: "Devolução" },
+];
+
+const movimentacaoBaseSchema = z.object({
   produtoId: z.string().min(1, "Selecione o produto"),
-  depositoId: z.string().min(1, "Selecione o deposito"),
-  quantidade: z.coerce.number().positive("Informe uma quantidade valida"),
+  depositoId: z.string().min(1, "Selecione o depósito"),
+  quantidade: z.coerce.number().positive("Informe uma quantidade válida"),
   data: z.string().min(1, "Informe a data"),
-  observacao: z.string().optional(),
-});
-const ajusteManualSchema = z.object({
-  produtoId: z.string().min(1, "Selecione o produto"),
-  depositoId: z.string().min(1, "Selecione o deposito"),
-  quantidadeAjustada: z.coerce.number().min(0, "Informe uma quantidade valida"),
-  motivo: z.string().min(3, "Informe o motivo"),
+  origemOperacional: z.enum([
+    "venda_loja",
+    "pedido_whatsapp",
+    "ajuste_interno",
+    "reposicao_estoque",
+    "devolucao",
+  ]),
   observacao: z.string().optional(),
 });
 
-type EntradaManualFormValues = z.infer<typeof entradaManualSchema>;
-type SaidaManualFormValues = z.infer<typeof entradaManualSchema>;
+const ajusteManualSchema = z.object({
+  produtoId: z.string().min(1, "Selecione o produto"),
+  depositoId: z.string().min(1, "Selecione o depósito"),
+  quantidadeAjustada: z.coerce.number().min(0, "Informe uma quantidade válida"),
+  motivo: z.string().min(3, "Informe o motivo"),
+  origemOperacional: z.enum([
+    "venda_loja",
+    "pedido_whatsapp",
+    "ajuste_interno",
+    "reposicao_estoque",
+    "devolucao",
+  ]),
+  observacao: z.string().optional(),
+});
+
+const reservaSchema = z.object({
+  produtoId: z.string().min(1, "Selecione o produto"),
+  depositoId: z.string().min(1, "Selecione o depósito"),
+  quantidadeReservada: z.coerce.number().positive("Informe uma quantidade válida"),
+  origemOperacional: z.enum([
+    "venda_loja",
+    "pedido_whatsapp",
+    "ajuste_interno",
+    "reposicao_estoque",
+    "devolucao",
+  ]),
+  observacao: z.string().optional(),
+});
+
+type EntradaSaidaFormValues = z.infer<typeof movimentacaoBaseSchema>;
 type AjusteManualFormValues = z.infer<typeof ajusteManualSchema>;
+type ReservaFormValues = z.infer<typeof reservaSchema>;
 
 export function EstoqueMovimentacoesPage() {
   const [periodoFiltro, setPeriodoFiltro] = useState("todos");
   const [tipoFiltro, setTipoFiltro] = useState("todos");
-  const [produtoFiltro, setProdutoFiltro] = useState("todos");
-  const [depositoFiltro, setDepositoFiltro] = useState("todos");
   const { feedback, showFeedback, clearFeedback } = useFeedback();
+
   const movimentacoes = useEstoqueEntityList("movimentacoes");
-  const produtosById = useEstoqueStore((state) => state.entities.produtos.byId);
-  const depositosById = useEstoqueStore((state) => state.entities.depositos.byId);
   const produtos = useEstoqueEntityList("produtos");
   const depositos = useEstoqueEntityList("depositos");
   const saldosProduto = useEstoqueEntityList("saldosProduto");
+  const reservas = useEstoqueEntityList("reservas");
+  const produtosById = useEstoqueStore((state) => state.entities.produtos.byId);
+  const depositosById = useEstoqueStore((state) => state.entities.depositos.byId);
   const registrarMovimentacao = useEstoqueStore((state) => state.actions.registrarMovimentacao);
   const ajustarEstoque = useEstoqueStore((state) => state.actions.ajustarEstoque);
+  const reservarEstoque = useEstoqueStore((state) => state.actions.reservarEstoque);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<EntradaManualFormValues>({
-    resolver: zodResolver(entradaManualSchema),
+  const entradaForm = useForm<EntradaSaidaFormValues>({
+    resolver: zodResolver(movimentacaoBaseSchema),
     defaultValues: {
       produtoId: "",
       depositoId: "",
       quantidade: 1,
       data: getTodayInputValue(),
+      origemOperacional: "reposicao_estoque",
       observacao: "",
     },
   });
-  const {
-    register: registerSaida,
-    handleSubmit: handleSubmitSaida,
-    reset: resetSaida,
-    setError: setSaidaError,
-    formState: { errors: saidaErrors, isSubmitting: isSubmittingSaida },
-  } = useForm<SaidaManualFormValues>({
-    resolver: zodResolver(entradaManualSchema),
+
+  const saidaForm = useForm<EntradaSaidaFormValues>({
+    resolver: zodResolver(movimentacaoBaseSchema),
     defaultValues: {
       produtoId: "",
       depositoId: "",
       quantidade: 1,
       data: getTodayInputValue(),
+      origemOperacional: "venda_loja",
       observacao: "",
     },
   });
-  const {
-    register: registerAjuste,
-    handleSubmit: handleSubmitAjuste,
-    reset: resetAjuste,
-    formState: { errors: ajusteErrors, isSubmitting: isSubmittingAjuste },
-  } = useForm<AjusteManualFormValues>({
+
+  const ajusteForm = useForm<AjusteManualFormValues>({
     resolver: zodResolver(ajusteManualSchema),
     defaultValues: {
       produtoId: "",
       depositoId: "",
       quantidadeAjustada: 0,
       motivo: "",
+      origemOperacional: "ajuste_interno",
       observacao: "",
     },
   });
 
-  const produtoOptions = useMemo(
-    () =>
-      Array.from(
-        new Map(
-          movimentacoes.map((movimentacao) => [
-            movimentacao.produtoId,
-            produtosById[movimentacao.produtoId]?.nome ?? "Produto",
-          ]),
-        ).entries(),
-      ),
-    [movimentacoes, produtosById],
-  );
-
-  const depositoOptions = useMemo(
-    () =>
-      Array.from(
-        new Map(
-          movimentacoes.flatMap((movimentacao) => {
-            const ids = [movimentacao.depositoOrigemId, movimentacao.depositoDestinoId].filter(
-              (value): value is string => Boolean(value),
-            );
-
-            return ids.map((id) => [id, depositosById[id]?.nome ?? "Deposito"] as const);
-          }),
-        ).entries(),
-      ),
-    [depositosById, movimentacoes],
-  );
+  const reservaForm = useForm<ReservaFormValues>({
+    resolver: zodResolver(reservaSchema),
+    defaultValues: {
+      produtoId: "",
+      depositoId: "",
+      quantidadeReservada: 1,
+      origemOperacional: "pedido_whatsapp",
+      observacao: "",
+    },
+  });
 
   const filteredMovimentacoes = useMemo(
     () =>
@@ -147,41 +161,36 @@ export function EstoqueMovimentacoesPage() {
           return false;
         }
 
-        if (produtoFiltro !== "todos" && movimentacao.produtoId !== produtoFiltro) {
-          return false;
-        }
-
-        if (
-          depositoFiltro !== "todos" &&
-          movimentacao.depositoOrigemId !== depositoFiltro &&
-          movimentacao.depositoDestinoId !== depositoFiltro
-        ) {
-          return false;
-        }
-
         return matchesPeriodoFiltro(movimentacao.dataMovimentacao, periodoFiltro);
       }),
-    [depositoFiltro, movimentacoes, periodoFiltro, produtoFiltro, tipoFiltro],
+    [movimentacoes, periodoFiltro, tipoFiltro],
   );
 
-  const rows: MovimentacaoRow[] = filteredMovimentacoes
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.dataMovimentacao).getTime() - new Date(a.dataMovimentacao).getTime(),
-    )
-    .map((movimentacao) => ({
-      id: movimentacao.id,
-      descricao: buildDescricao(movimentacao.tipo, produtosById[movimentacao.produtoId]?.nome),
-      origem: buildOrigem(
-        movimentacao,
-        depositosById[movimentacao.depositoOrigemId ?? ""],
-        depositosById[movimentacao.depositoDestinoId ?? ""],
-      ),
-      data: formatDateBR(movimentacao.dataMovimentacao, true),
-      tipo: formatMovimentacaoTipo(movimentacao.tipo),
-      status: formatMovimentacaoStatus(movimentacao.status),
-    }));
+  const rows: MovimentacaoRow[] = useMemo(
+    () =>
+      filteredMovimentacoes
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(b.dataMovimentacao).getTime() - new Date(a.dataMovimentacao).getTime(),
+        )
+        .map((movimentacao) => ({
+          id: movimentacao.id,
+          descricao: buildDescricao(movimentacao.tipo, produtosById[movimentacao.produtoId]?.nome),
+          origem: buildOrigem(
+            movimentacao,
+            depositosById[movimentacao.depositoOrigemId ?? ""],
+            depositosById[movimentacao.depositoDestinoId ?? ""],
+          ),
+          data: formatDateBR(movimentacao.dataMovimentacao, true),
+          tipo: formatMovimentacaoTipo(movimentacao.tipo),
+          status: formatMovimentacaoStatus(movimentacao.status),
+          origemOperacional: formatMovimentacaoOrigemOperacional(
+            movimentacao.origemOperacional,
+          ),
+        })),
+    [depositosById, filteredMovimentacoes, produtosById],
+  );
 
   const entradasHoje = movimentacoes.filter(
     (item) => item.tipo === "entrada" && isToday(item.dataMovimentacao),
@@ -189,9 +198,9 @@ export function EstoqueMovimentacoesPage() {
   const saidasHoje = movimentacoes.filter(
     (item) => item.tipo === "saida" && isToday(item.dataMovimentacao),
   ).length;
-  const pendencias = movimentacoes.filter((item) => item.status === "pendente").length;
+  const reservasAtivas = reservas.filter((item) => item.status === "ativa").length;
 
-  const onSubmit = handleSubmit((values) => {
+  const onSubmitEntrada = entradaForm.handleSubmit((values) => {
     const produto = produtosById[values.produtoId];
 
     if (!produto) {
@@ -202,6 +211,7 @@ export function EstoqueMovimentacoesPage() {
       tipo: "entrada",
       status: "confirmada",
       origemTipo: "manual",
+      origemOperacional: values.origemOperacional,
       produtoId: values.produtoId,
       depositoDestinoId: values.depositoId,
       quantidade: values.quantidade,
@@ -210,20 +220,23 @@ export function EstoqueMovimentacoesPage() {
       observacao: values.observacao?.trim() || undefined,
     });
 
-    reset({
+    entradaForm.reset({
       produtoId: "",
       depositoId: "",
       quantidade: 1,
       data: getTodayInputValue(),
+      origemOperacional: "reposicao_estoque",
       observacao: "",
     });
+
     showFeedback({
       tone: "success",
       title: "Entrada registrada",
-      description: "O saldo e a listagem de movimentações já foram atualizados.",
+      description: "A movimentação foi salva com a origem operacional informada.",
     });
   });
-  const onSubmitSaida = handleSubmitSaida((values) => {
+
+  const onSubmitSaida = saidaForm.handleSubmit((values) => {
     const produto = produtosById[values.produtoId];
 
     if (!produto) {
@@ -236,8 +249,8 @@ export function EstoqueMovimentacoesPage() {
     const saldoDisponivel = saldo?.quantidadeDisponivel ?? 0;
 
     if (saldoDisponivel < values.quantidade) {
-      setSaidaError("quantidade", {
-        message: `Saldo disponivel insuficiente. Disponivel: ${saldoDisponivel}`,
+      saidaForm.setError("quantidade", {
+        message: `Saldo disponível insuficiente. Disponível: ${saldoDisponivel}`,
       });
       showFeedback({
         tone: "error",
@@ -251,6 +264,7 @@ export function EstoqueMovimentacoesPage() {
       tipo: "saida",
       status: "confirmada",
       origemTipo: "manual",
+      origemOperacional: values.origemOperacional,
       produtoId: values.produtoId,
       depositoOrigemId: values.depositoId,
       quantidade: values.quantidade,
@@ -259,353 +273,179 @@ export function EstoqueMovimentacoesPage() {
       observacao: values.observacao?.trim() || undefined,
     });
 
-    resetSaida({
+    saidaForm.reset({
       produtoId: "",
       depositoId: "",
       quantidade: 1,
       data: getTodayInputValue(),
+      origemOperacional: "venda_loja",
       observacao: "",
     });
+
     showFeedback({
       tone: "success",
       title: "Saída registrada",
-      description: "A movimentação foi confirmada e o saldo foi abatido.",
+      description: "A saída foi salva com o canal operacional informado.",
     });
   });
-  const onSubmitAjuste = handleSubmitAjuste((values) => {
+
+  const onSubmitAjuste = ajusteForm.handleSubmit((values) => {
     ajustarEstoque({
       produtoId: values.produtoId,
       depositoId: values.depositoId,
       quantidadeAjustada: values.quantidadeAjustada,
       dataMovimentacao: new Date().toISOString(),
       motivo: values.motivo.trim(),
+      origemOperacional: values.origemOperacional,
       observacao: values.observacao?.trim() || undefined,
     });
 
-    resetAjuste({
+    ajusteForm.reset({
       produtoId: "",
       depositoId: "",
       quantidadeAjustada: 0,
       motivo: "",
+      origemOperacional: "ajuste_interno",
       observacao: "",
     });
+
     showFeedback({
       tone: "success",
       title: "Ajuste registrado",
-      description: "O saldo físico e a movimentação de ajuste já foram atualizados.",
+      description: "O ajuste foi salvo com a origem operacional informada.",
+    });
+  });
+
+  const onSubmitReserva = reservaForm.handleSubmit((values) => {
+    const reservaId = reservarEstoque({
+      produtoId: values.produtoId,
+      depositoId: values.depositoId,
+      origemTipo: "manual",
+      origemId: `manual-${Date.now()}`,
+      quantidadeReservada: values.quantidadeReservada,
+      origemOperacional: values.origemOperacional,
+      observacao: values.observacao?.trim() || undefined,
+    });
+
+    if (!reservaId) {
+      showFeedback({
+        tone: "error",
+        title: "Reserva não registrada",
+        description: "Revise o saldo disponível e tente novamente.",
+      });
+      return;
+    }
+
+    reservaForm.reset({
+      produtoId: "",
+      depositoId: "",
+      quantidadeReservada: 1,
+      origemOperacional: "pedido_whatsapp",
+      observacao: "",
+    });
+
+    showFeedback({
+      tone: "success",
+      title: "Reserva registrada",
+      description: "A reserva entrou no estoque com a origem operacional informada.",
     });
   });
 
   return (
     <PageContainer>
       <SectionHeader
-        title="Movimentacoes de estoque"
-        description="Acompanhe entradas e saidas registradas pela operacao com foco em rastreabilidade."
-        actions={[{ label: "Nova movimentacao" }]}
+        title="Movimentações"
+        description="Registre entradas, saídas, ajustes e reservas com a origem real da operação da loja."
+        actions={[{ label: "Registrar entrada" }]}
       />
 
       <section className="grid gap-6 lg:grid-cols-3">
         <ContextCard
           title="Entradas hoje"
           value={String(entradasHoje)}
-          description="Recebimentos e integracoes finalizadas na janela operacional atual."
+          description="Reposições, devoluções e recebimentos do dia."
         />
         <ContextCard
-          title="Saidas hoje"
+          title="Saídas hoje"
           value={String(saidasHoje)}
-          description="Baixas associadas a pedidos, consumo interno e separacao logistica."
+          description="Baixas de venda e outras saídas da operação."
         />
         <ContextCard
-          title="Pendencias"
-          value={String(pendencias)}
-          description="Registros que aguardam conferencia, ajuste ou revisao final."
+          title="Reservas ativas"
+          value={String(reservasAtivas)}
+          description="Itens separados para pedidos e atendimentos."
         />
       </section>
 
-      <ActionBar
-        items={[
-          { label: "Registrar entrada" },
-          { label: "Registrar saida", tone: "neutral" },
-        ]}
-      />
-
       <FeedbackBanner feedback={feedback} onDismiss={clearFeedback} />
 
-      <FormSectionCard
-        title="Lancar entrada manual"
-        description="Registre entradas diretamente no store para atualizar saldo e movimentacoes sem backend."
-      >
-        <form onSubmit={onSubmit} className="grid gap-4 lg:grid-cols-2 xl:grid-cols-5">
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Produto</span>
-            <select
-              {...register("produtoId")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            >
-              <option value="">Selecione</option>
-              {produtos.map((produto) => (
-                <option key={produto.id} value={produto.id}>
-                  {produto.nome}
-                </option>
-              ))}
-            </select>
-            {errors.produtoId ? (
-              <p className="text-xs text-[#b42318]">{errors.produtoId.message}</p>
-            ) : null}
-          </label>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <FormSectionCard
+          title="Lançar entrada"
+          description="Use a origem operacional para mostrar se a entrada veio de reposição ou devolução."
+        >
+          <MovimentacaoForm
+            form={entradaForm}
+            produtos={produtos}
+            depositos={depositos}
+            quantidadeField="quantidade"
+            onSubmit={onSubmitEntrada}
+            submitLabel="Registrar entrada"
+          />
+        </FormSectionCard>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Deposito</span>
-            <select
-              {...register("depositoId")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            >
-              <option value="">Selecione</option>
-              {depositos.map((deposito) => (
-                <option key={deposito.id} value={deposito.id}>
-                  {deposito.nome}
-                </option>
-              ))}
-            </select>
-            {errors.depositoId ? (
-              <p className="text-xs text-[#b42318]">{errors.depositoId.message}</p>
-            ) : null}
-          </label>
+        <FormSectionCard
+          title="Lançar saída"
+          description="Informe se a saída veio da loja, do WhatsApp, de devolução ou outro contexto operacional."
+        >
+          <MovimentacaoForm
+            form={saidaForm}
+            produtos={produtos}
+            depositos={depositos}
+            quantidadeField="quantidade"
+            onSubmit={onSubmitSaida}
+            submitLabel="Registrar saída"
+          />
+        </FormSectionCard>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Quantidade</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              {...register("quantidade", { valueAsNumber: true })}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-            {errors.quantidade ? (
-              <p className="text-xs text-[#b42318]">{errors.quantidade.message}</p>
-            ) : null}
-          </label>
+        <FormSectionCard
+          title="Lançar ajuste"
+          description="Registre ajuste interno sem perder o motivo operacional da movimentação."
+        >
+          <AjusteForm
+            form={ajusteForm}
+            produtos={produtos}
+            depositos={depositos}
+            onSubmit={onSubmitAjuste}
+          />
+        </FormSectionCard>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Data</span>
-            <input
-              type="date"
-              {...register("data")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-            {errors.data ? <p className="text-xs text-[#b42318]">{errors.data.message}</p> : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Observacao</span>
-            <input
-              type="text"
-              {...register("observacao")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-          </label>
-
-          <div className="xl:col-span-5 flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="h-11 rounded-xl bg-[var(--color-primary)] px-6 text-sm font-medium text-white disabled:opacity-60"
-            >
-              Registrar entrada
-            </button>
-          </div>
-        </form>
-      </FormSectionCard>
-
-      <FormSectionCard
-        title="Lancar saida manual"
-        description="Registre saidas com validacao de saldo disponivel antes de gravar a movimentacao."
-      >
-        <form onSubmit={onSubmitSaida} className="grid gap-4 lg:grid-cols-2 xl:grid-cols-5">
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Produto</span>
-            <select
-              {...registerSaida("produtoId")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            >
-              <option value="">Selecione</option>
-              {produtos.map((produto) => (
-                <option key={produto.id} value={produto.id}>
-                  {produto.nome}
-                </option>
-              ))}
-            </select>
-            {saidaErrors.produtoId ? (
-              <p className="text-xs text-[#b42318]">{saidaErrors.produtoId.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Deposito</span>
-            <select
-              {...registerSaida("depositoId")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            >
-              <option value="">Selecione</option>
-              {depositos.map((deposito) => (
-                <option key={deposito.id} value={deposito.id}>
-                  {deposito.nome}
-                </option>
-              ))}
-            </select>
-            {saidaErrors.depositoId ? (
-              <p className="text-xs text-[#b42318]">{saidaErrors.depositoId.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Quantidade</span>
-            <input
-              type="number"
-              min={1}
-              step={1}
-              {...registerSaida("quantidade", { valueAsNumber: true })}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-            {saidaErrors.quantidade ? (
-              <p className="text-xs text-[#b42318]">{saidaErrors.quantidade.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Data</span>
-            <input
-              type="date"
-              {...registerSaida("data")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-            {saidaErrors.data ? (
-              <p className="text-xs text-[#b42318]">{saidaErrors.data.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Observacao</span>
-            <input
-              type="text"
-              {...registerSaida("observacao")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-          </label>
-
-          <div className="xl:col-span-5 flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmittingSaida}
-              className="h-11 rounded-xl bg-[var(--color-primary)] px-6 text-sm font-medium text-white disabled:opacity-60"
-            >
-              Registrar saida
-            </button>
-          </div>
-        </form>
-      </FormSectionCard>
-
-      <FormSectionCard
-        title="Lancar ajuste manual"
-        description="Ajuste o saldo fisico do deposito e grave uma movimentacao do tipo ajuste."
-      >
-        <form onSubmit={onSubmitAjuste} className="grid gap-4 lg:grid-cols-2 xl:grid-cols-5">
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Produto</span>
-            <select
-              {...registerAjuste("produtoId")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            >
-              <option value="">Selecione</option>
-              {produtos.map((produto) => (
-                <option key={produto.id} value={produto.id}>
-                  {produto.nome}
-                </option>
-              ))}
-            </select>
-            {ajusteErrors.produtoId ? (
-              <p className="text-xs text-[#b42318]">{ajusteErrors.produtoId.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Deposito</span>
-            <select
-              {...registerAjuste("depositoId")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            >
-              <option value="">Selecione</option>
-              {depositos.map((deposito) => (
-                <option key={deposito.id} value={deposito.id}>
-                  {deposito.nome}
-                </option>
-              ))}
-            </select>
-            {ajusteErrors.depositoId ? (
-              <p className="text-xs text-[#b42318]">{ajusteErrors.depositoId.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Quantidade ajustada</span>
-            <input
-              type="number"
-              min={0}
-              step={1}
-              {...registerAjuste("quantidadeAjustada", { valueAsNumber: true })}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-            {ajusteErrors.quantidadeAjustada ? (
-              <p className="text-xs text-[#b42318]">{ajusteErrors.quantidadeAjustada.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Motivo</span>
-            <input
-              type="text"
-              {...registerAjuste("motivo")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-            {ajusteErrors.motivo ? (
-              <p className="text-xs text-[#b42318]">{ajusteErrors.motivo.message}</p>
-            ) : null}
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-medium text-[var(--color-text)]">Observacao</span>
-            <input
-              type="text"
-              {...registerAjuste("observacao")}
-              className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-            />
-          </label>
-
-          <div className="xl:col-span-5 flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmittingAjuste}
-              className="h-11 rounded-xl bg-[var(--color-primary)] px-6 text-sm font-medium text-white disabled:opacity-60"
-            >
-              Registrar ajuste
-            </button>
-          </div>
-        </form>
-      </FormSectionCard>
+        <FormSectionCard
+          title="Lançar reserva"
+          description="Reserve itens para pedido WhatsApp, venda na loja ou outra necessidade da rotina comercial."
+        >
+          <ReservaForm
+            form={reservaForm}
+            produtos={produtos}
+            depositos={depositos}
+            onSubmit={onSubmitReserva}
+          />
+        </FormSectionCard>
+      </div>
 
       <FilterBar
-        placeholder="Buscar por item, origem ou referencia"
+        placeholder="Filtrar movimentações"
         chips={[
           { label: "Todas", active: tipoFiltro === "todos" },
           { label: "Entradas", active: tipoFiltro === "entrada" },
-          { label: "Saidas", active: tipoFiltro === "saida" },
-          { label: "Pendentes", active: periodoFiltro === "hoje" || tipoFiltro === "todos" },
+          { label: "Saídas", active: tipoFiltro === "saida" },
+          { label: "Reservas", active: tipoFiltro === "reserva" },
         ]}
       />
 
-      <section className="grid gap-4 rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4 shadow-[var(--shadow-sm)] md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-4 shadow-[var(--shadow-sm)] md:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm font-medium text-[var(--color-text)]">Periodo</span>
+          <span className="text-sm font-medium text-[var(--color-text)]">Período</span>
           <select
             value={periodoFiltro}
             onChange={(event) => setPeriodoFiltro(event.target.value)}
@@ -613,8 +453,8 @@ export function EstoqueMovimentacoesPage() {
           >
             <option value="todos">Todos</option>
             <option value="hoje">Hoje</option>
-            <option value="7dias">Ultimos 7 dias</option>
-            <option value="30dias">Ultimos 30 dias</option>
+            <option value="7dias">Últimos 7 dias</option>
+            <option value="30dias">Últimos 30 dias</option>
           </select>
         </label>
 
@@ -627,43 +467,10 @@ export function EstoqueMovimentacoesPage() {
           >
             <option value="todos">Todos</option>
             <option value="entrada">Entrada</option>
-            <option value="saida">Saida</option>
-            <option value="transferencia">Transferencia</option>
+            <option value="saida">Saída</option>
             <option value="ajuste">Ajuste</option>
             <option value="reserva">Reserva</option>
-            <option value="liberacao_reserva">Liberacao de reserva</option>
-          </select>
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-sm font-medium text-[var(--color-text)]">Produto</span>
-          <select
-            value={produtoFiltro}
-            onChange={(event) => setProdutoFiltro(event.target.value)}
-            className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-          >
-            <option value="todos">Todos</option>
-            {produtoOptions.map(([id, nome]) => (
-              <option key={id} value={id}>
-                {nome}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="space-y-2">
-          <span className="text-sm font-medium text-[var(--color-text)]">Deposito</span>
-          <select
-            value={depositoFiltro}
-            onChange={(event) => setDepositoFiltro(event.target.value)}
-            className="h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none"
-          >
-            <option value="todos">Todos</option>
-            {depositoOptions.map(([id, nome]) => (
-              <option key={id} value={id}>
-                {nome}
-              </option>
-            ))}
+            <option value="liberacao_reserva">Liberação de reserva</option>
           </select>
         </label>
       </section>
@@ -673,13 +480,13 @@ export function EstoqueMovimentacoesPage() {
           <div className="mb-5 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-[var(--color-text)]">
-                Linha do tempo operacional
+                Últimas movimentações
               </h2>
               <p className="text-sm text-[var(--color-text-soft)]">
-                Historico recente das movimentacoes tratadas pelo estoque.
+                Agora a origem operacional aparece junto de cada movimentação.
               </p>
             </div>
-            <StatusBadge variant="info">{rows.length} registros recentes</StatusBadge>
+            <StatusBadge variant="info">{rows.length} registros</StatusBadge>
           </div>
 
           <div className="space-y-3">
@@ -690,18 +497,16 @@ export function EstoqueMovimentacoesPage() {
               >
                 <div className="space-y-1">
                   <h3 className="font-medium text-[var(--color-text)]">{item.descricao}</h3>
-                  <p className="text-sm text-[var(--color-text-soft)]">
-                    {item.origem} • {item.data}
-                  </p>
+                  <p className="text-sm text-[var(--color-text-soft)]">{item.origem}</p>
+                  <p className="text-sm text-[var(--color-text-soft)]">{item.data}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <StatusBadge variant={item.tipo === "Entrada" ? "info" : "warning"}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge variant="info">{item.origemOperacional}</StatusBadge>
+                  <StatusBadge variant={item.tipo === "Saída" ? "warning" : item.tipo === "Reserva" ? "warning" : "info"}>
                     {item.tipo}
                   </StatusBadge>
-                  <StatusBadge
-                    variant={item.status === "Confirmada" ? "success" : "warning"}
-                  >
+                  <StatusBadge variant={item.status === "Confirmada" ? "success" : "warning"}>
                     {item.status}
                   </StatusBadge>
                 </div>
@@ -711,38 +516,203 @@ export function EstoqueMovimentacoesPage() {
         </section>
       ) : (
         <EmptyState
-          title="Nenhuma movimentacao registrada"
-          description="As entradas e saidas processadas aparecerao aqui com contexto operacional e badges de status."
-          actionLabel="Registrar movimentacao"
+          title="Nenhuma movimentação registrada"
+          description="As entradas, saídas, ajustes e reservas aparecem aqui com a origem operacional informada."
+          actionLabel="Registrar movimentação"
         />
       )}
     </PageContainer>
   );
 }
 
+function MovimentacaoForm({ form, produtos, depositos, quantidadeField, onSubmit, submitLabel }: {
+  form: ReturnType<typeof useForm<EntradaSaidaFormValues>>;
+  produtos: Array<{ id: string; nome: string }>;
+  depositos: Array<{ id: string; nome: string }>;
+  quantidadeField: "quantidade";
+  onSubmit: () => void;
+  submitLabel: string;
+}) {
+  const { register, formState: { errors, isSubmitting } } = form;
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <SelectField label="Produto" error={errors.produtoId?.message}>
+        <select {...register("produtoId")} className={fieldClassName}>
+          <option value="">Selecione</option>
+          {produtos.map((produto) => (
+            <option key={produto.id} value={produto.id}>{produto.nome}</option>
+          ))}
+        </select>
+      </SelectField>
+
+      <SelectField label="Depósito" error={errors.depositoId?.message}>
+        <select {...register("depositoId")} className={fieldClassName}>
+          <option value="">Selecione</option>
+          {depositos.map((deposito) => (
+            <option key={deposito.id} value={deposito.id}>{deposito.nome}</option>
+          ))}
+        </select>
+      </SelectField>
+
+      <InputField label="Quantidade" error={errors.quantidade?.message}>
+        <input type="number" min={1} step={1} {...register(quantidadeField, { valueAsNumber: true })} className={fieldClassName} />
+      </InputField>
+
+      <InputField label="Data" error={errors.data?.message}>
+        <input type="date" {...register("data")} className={fieldClassName} />
+      </InputField>
+
+      <SelectField label="Origem operacional" error={errors.origemOperacional?.message}>
+        <select {...register("origemOperacional")} className={fieldClassName}>
+          {origemOperacionalOptions.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </SelectField>
+
+      <InputField label="Observação">
+        <input type="text" {...register("observacao")} className={fieldClassName} />
+      </InputField>
+
+      <div className="xl:col-span-3 flex justify-end">
+        <button type="submit" disabled={isSubmitting} className="h-11 rounded-xl bg-[var(--color-primary)] px-6 text-sm font-medium text-white disabled:opacity-60">
+          {submitLabel}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function AjusteForm({ form, produtos, depositos, onSubmit }: {
+  form: ReturnType<typeof useForm<AjusteManualFormValues>>;
+  produtos: Array<{ id: string; nome: string }>;
+  depositos: Array<{ id: string; nome: string }>;
+  onSubmit: () => void;
+}) {
+  const { register, formState: { errors, isSubmitting } } = form;
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <SelectField label="Produto" error={errors.produtoId?.message}>
+        <select {...register("produtoId")} className={fieldClassName}>
+          <option value="">Selecione</option>
+          {produtos.map((produto) => (
+            <option key={produto.id} value={produto.id}>{produto.nome}</option>
+          ))}
+        </select>
+      </SelectField>
+      <SelectField label="Depósito" error={errors.depositoId?.message}>
+        <select {...register("depositoId")} className={fieldClassName}>
+          <option value="">Selecione</option>
+          {depositos.map((deposito) => (
+            <option key={deposito.id} value={deposito.id}>{deposito.nome}</option>
+          ))}
+        </select>
+      </SelectField>
+      <InputField label="Quantidade ajustada" error={errors.quantidadeAjustada?.message}>
+        <input type="number" min={0} step={1} {...register("quantidadeAjustada", { valueAsNumber: true })} className={fieldClassName} />
+      </InputField>
+      <InputField label="Motivo" error={errors.motivo?.message}>
+        <input type="text" {...register("motivo")} className={fieldClassName} />
+      </InputField>
+      <SelectField label="Origem operacional" error={errors.origemOperacional?.message}>
+        <select {...register("origemOperacional")} className={fieldClassName}>
+          {origemOperacionalOptions.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </SelectField>
+      <InputField label="Observação">
+        <input type="text" {...register("observacao")} className={fieldClassName} />
+      </InputField>
+      <div className="xl:col-span-3 flex justify-end">
+        <button type="submit" disabled={isSubmitting} className="h-11 rounded-xl bg-[var(--color-primary)] px-6 text-sm font-medium text-white disabled:opacity-60">
+          Registrar ajuste
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function ReservaForm({ form, produtos, depositos, onSubmit }: {
+  form: ReturnType<typeof useForm<ReservaFormValues>>;
+  produtos: Array<{ id: string; nome: string }>;
+  depositos: Array<{ id: string; nome: string }>;
+  onSubmit: () => void;
+}) {
+  const { register, formState: { errors, isSubmitting } } = form;
+
+  return (
+    <form onSubmit={onSubmit} className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+      <SelectField label="Produto" error={errors.produtoId?.message}>
+        <select {...register("produtoId")} className={fieldClassName}>
+          <option value="">Selecione</option>
+          {produtos.map((produto) => (
+            <option key={produto.id} value={produto.id}>{produto.nome}</option>
+          ))}
+        </select>
+      </SelectField>
+      <SelectField label="Depósito" error={errors.depositoId?.message}>
+        <select {...register("depositoId")} className={fieldClassName}>
+          <option value="">Selecione</option>
+          {depositos.map((deposito) => (
+            <option key={deposito.id} value={deposito.id}>{deposito.nome}</option>
+          ))}
+        </select>
+      </SelectField>
+      <InputField label="Quantidade reservada" error={errors.quantidadeReservada?.message}>
+        <input type="number" min={1} step={1} {...register("quantidadeReservada", { valueAsNumber: true })} className={fieldClassName} />
+      </InputField>
+      <SelectField label="Origem operacional" error={errors.origemOperacional?.message}>
+        <select {...register("origemOperacional")} className={fieldClassName}>
+          {origemOperacionalOptions.map((option) => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
+        </select>
+      </SelectField>
+      <InputField label="Observação">
+        <input type="text" {...register("observacao")} className={fieldClassName} />
+      </InputField>
+      <div className="xl:col-span-3 flex justify-end">
+        <button type="submit" disabled={isSubmitting} className="h-11 rounded-xl bg-[var(--color-primary)] px-6 text-sm font-medium text-white disabled:opacity-60">
+          Registrar reserva
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function SelectField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+  return (
+    <label className="space-y-2">
+      <span className="text-sm font-medium text-[var(--color-text)]">{label}</span>
+      {children}
+      {error ? <p className="text-xs text-[#b42318]">{error}</p> : null}
+    </label>
+  );
+}
+
+function InputField({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+  return (
+    <label className="space-y-2">
+      <span className="text-sm font-medium text-[var(--color-text)]">{label}</span>
+      {children}
+      {error ? <p className="text-xs text-[#b42318]">{error}</p> : null}
+    </label>
+  );
+}
+
+const fieldClassName = "h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none";
+
 function buildDescricao(tipo: string, produtoNome?: string) {
   const nome = produtoNome ?? "Produto";
 
-  if (tipo === "entrada") {
-    return `Entrada de ${nome}`;
-  }
-
-  if (tipo === "saida") {
-    return `Saida de ${nome}`;
-  }
-
-  if (tipo === "transferencia") {
-    return `Transferencia de ${nome}`;
-  }
-
-  if (tipo === "reserva") {
-    return `Reserva de ${nome}`;
-  }
-
-  if (tipo === "liberacao_reserva") {
-    return `Liberacao de reserva de ${nome}`;
-  }
-
+  if (tipo === "entrada") return `Entrada de ${nome}`;
+  if (tipo === "saida") return `Saída de ${nome}`;
+  if (tipo === "transferencia") return `Transferência de ${nome}`;
+  if (tipo === "reserva") return `Reserva de ${nome}`;
+  if (tipo === "liberacao_reserva") return `Liberação de reserva de ${nome}`;
   return `Ajuste de ${nome}`;
 }
 
@@ -771,31 +741,7 @@ function buildOrigem(
     return `${depositoOrigem?.nome ?? "Origem"} • ${quantidade}`;
   }
 
-  return `${formatOrigemTipo(movimentacao.origemTipo)} • ${quantidade}`;
-}
-
-function formatOrigemTipo(origemTipo: string) {
-  if (origemTipo === "pedido_compra") {
-    return "Pedido de compra";
-  }
-
-  if (origemTipo === "entrada_mercadoria") {
-    return "Entrada de mercadoria";
-  }
-
-  if (origemTipo === "inventario") {
-    return "Inventario";
-  }
-
-  if (origemTipo === "reserva") {
-    return "Reserva";
-  }
-
-  if (origemTipo === "transferencia") {
-    return "Transferencia";
-  }
-
-  return "Manual";
+  return quantidade;
 }
 
 function isToday(value: string) {
@@ -810,26 +756,15 @@ function isToday(value: string) {
 }
 
 function matchesPeriodoFiltro(value: string, periodoFiltro: string) {
-  if (periodoFiltro === "todos") {
-    return true;
-  }
-
-  if (periodoFiltro === "hoje") {
-    return isToday(value);
-  }
+  if (periodoFiltro === "todos") return true;
+  if (periodoFiltro === "hoje") return isToday(value);
 
   const now = new Date();
   const date = new Date(value);
   const diffInDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
 
-  if (periodoFiltro === "7dias") {
-    return diffInDays <= 7;
-  }
-
-  if (periodoFiltro === "30dias") {
-    return diffInDays <= 30;
-  }
-
+  if (periodoFiltro === "7dias") return diffInDays <= 7;
+  if (periodoFiltro === "30dias") return diffInDays <= 30;
   return true;
 }
 

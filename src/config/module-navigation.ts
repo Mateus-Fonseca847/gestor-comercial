@@ -1,46 +1,72 @@
-import type { ModuleMenuData } from "@/components/navigation/module-mega-menu";
+﻿import type { ModuleMenuData } from "@/components/navigation/module-mega-menu";
 
 export type ModuleNavItem = {
   label: string;
   href: string;
-  behavior: "menu";
-  menu: ModuleMenuData;
+  behavior: "menu" | "link";
+  menu?: ModuleMenuData;
+  priority?: "primary" | "secondary";
 };
 
 export const moduleNavigation: ModuleNavItem[] = [
   {
+    label: "Home",
+    href: "/",
+    behavior: "link",
+    priority: "primary",
+  },
+  {
     label: "Estoque",
     href: "/estoque",
     behavior: "menu",
+    priority: "primary",
     menu: {
       sections: [
         {
           title: "principal",
           items: [
-            { title: "Dashboard", href: "/estoque" },
+            { title: "Resumo", href: "/estoque" },
             { title: "Produtos", href: "/estoque/produtos" },
             { title: "Movimentações", href: "/estoque/movimentacoes", badge: "Hoje" },
+            { title: "Reposição", href: "/estoque/reposicao", badge: "Acompanhar" },
             { title: "Fornecedores", href: "/estoque/fornecedores" },
             { title: "Relatórios", href: "/estoque/relatorios" },
+          ],
+        },
+        {
+          title: "mais recursos",
+          items: [
+            { title: "Entradas", href: "/estoque/entradas" },
+            { title: "Compras", href: "/estoque/compras" },
+            { title: "Depósitos", href: "/estoque/depositos" },
+            { title: "Transferências", href: "/estoque/transferencias" },
+            { title: "Inventário", href: "/estoque/inventario" },
+            { title: "Categorias", href: "/estoque/categorias" },
           ],
         },
       ],
     },
   },
   {
-    label: "Cadastros",
+    label: "Clientes",
     href: "/cadastros",
     behavior: "menu",
+    priority: "primary",
     menu: {
       sections: [
         {
           title: "principal",
           items: [
             { title: "Clientes", href: "/cadastros/clientes" },
-            { title: "Funcionários", href: "/cadastros/funcionarios" },
-            { title: "Leads", href: "/cadastros/leads" },
+            { title: "Leads", href: "/cadastros/leads", badge: "WhatsApp" },
             { title: "Tickets", href: "/cadastros/tickets" },
             { title: "Relatórios", href: "/cadastros/relatorios" },
+          ],
+        },
+        {
+          title: "cadastros",
+          items: [
+            { title: "Funcionários", href: "/cadastros/funcionarios" },
           ],
         },
       ],
@@ -50,6 +76,7 @@ export const moduleNavigation: ModuleNavItem[] = [
     label: "Vendas",
     href: "/vendas",
     behavior: "menu",
+    priority: "primary",
     menu: {
       sections: [
         {
@@ -68,6 +95,7 @@ export const moduleNavigation: ModuleNavItem[] = [
     label: "Financeiro",
     href: "/financeiro",
     behavior: "menu",
+    priority: "secondary",
     menu: {
       sections: [
         {
@@ -84,27 +112,10 @@ export const moduleNavigation: ModuleNavItem[] = [
     },
   },
   {
-    label: "Usuários",
-    href: "/usuarios",
-    behavior: "menu",
-    menu: {
-      sections: [
-        {
-          title: "principal",
-          items: [
-            { title: "Perfis", href: "/usuarios/perfis" },
-            { title: "Trocar usuário", href: "/usuarios/trocar-usuario" },
-            { title: "Logs", href: "/usuarios/logs" },
-            { title: "Relatórios", href: "/usuarios/relatorios" },
-          ],
-        },
-      ],
-    },
-  },
-  {
     label: "Logística",
     href: "/logistica",
     behavior: "menu",
+    priority: "secondary",
     menu: {
       sections: [
         {
@@ -120,9 +131,29 @@ export const moduleNavigation: ModuleNavItem[] = [
     },
   },
   {
+    label: "Usuários",
+    href: "/usuarios",
+    behavior: "menu",
+    priority: "secondary",
+    menu: {
+      sections: [
+        {
+          title: "principal",
+          items: [
+            { title: "Perfis", href: "/usuarios/perfis" },
+            { title: "Trocar usuário", href: "/usuarios/trocar-usuario" },
+            { title: "Logs", href: "/usuarios/logs" },
+            { title: "Relatórios", href: "/usuarios/relatorios" },
+          ],
+        },
+      ],
+    },
+  },
+  {
     label: "Configurações",
     href: "/configuracoes",
     behavior: "menu",
+    priority: "secondary",
     menu: {
       sections: [
         {

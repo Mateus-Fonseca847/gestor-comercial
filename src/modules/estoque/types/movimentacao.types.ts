@@ -18,11 +18,19 @@ export type MovimentacaoOrigemTipo =
   | "inventario"
   | "reserva";
 
+export type MovimentacaoOrigemOperacional =
+  | "venda_loja"
+  | "pedido_whatsapp"
+  | "ajuste_interno"
+  | "reposicao_estoque"
+  | "devolucao";
+
 export type Movimentacao = AuditInfo & {
   id: EntityId;
   tipo: MovimentacaoTipo;
   status: MovimentacaoStatus;
   origemTipo: MovimentacaoOrigemTipo;
+  origemOperacional?: MovimentacaoOrigemOperacional;
   origemId?: EntityId;
   produtoId: EntityId;
   variacaoId?: EntityId;

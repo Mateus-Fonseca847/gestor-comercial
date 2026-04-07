@@ -30,6 +30,8 @@ import type {
   ProdutoSaldo,
   Reserva,
   Transferencia,
+  MovimentacaoOrigemOperacional,
+  ProdutoStatus,
 } from "@/modules/estoque/types";
 
 type CollectionKey = keyof EstoqueEntitiesState;
@@ -91,6 +93,7 @@ type ReservarEstoqueInput = Omit<
   "id" | "criadoEm" | "atualizadoEm" | "status" | "quantidadeAtendida" | "reservadaEm"
 > & {
   id?: EntityId;
+  origemOperacional?: MovimentacaoOrigemOperacional;
 };
 
 type LiberarReservaInput = {
@@ -106,6 +109,7 @@ type AjustarEstoqueInput = {
   dataMovimentacao: string;
   motivo: string;
   observacao?: string;
+  origemOperacional?: MovimentacaoOrigemOperacional;
 };
 
 type CriarTransferenciaInput = {
@@ -137,6 +141,7 @@ type RegistrarEntradaMercadoriaInput = {
   quantidade: number;
   dataRecebimento: string;
   observacao?: string;
+  origemOperacional?: MovimentacaoOrigemOperacional;
 };
 
 export type EstoqueActions = {
@@ -231,6 +236,17 @@ function calcularStatusPedidoCompraRecebimento(
   }
 
   return "parcial";
+}
+
+function getDefaultOrigemOperacional(
+  tipo: Movimentacao["tipo"],
+): MovimentacaoOrigemOperacional {
+  if (tipo === "entrada") return "reposicao_estoque";
+  if (tipo === "saida" || tipo === "reserva" || tipo === "liberacao_reserva") {
+    return "venda_loja";
+  }
+
+  return "ajuste_interno";
 }
 
 function applyMovimentacaoToSaldos(
@@ -552,7 +568,7 @@ export const createEstoqueActions: StateCreator<
         const produtos = upsertCollectionEntity(state.entities.produtos, {
           ...produtoAtual,
           ativo: false,
-          status: "inativo",
+          status: "inativo" as ProdutoStatus,
           atualizadoEm: createTimestamp(),
         });
 
@@ -701,27 +717,27 @@ export const createEstoqueActions: StateCreator<
 
       const timestamp = createTimestamp();
       const pedidoId = createStoreEntityId("pc");
-      const itens = input.itens
-        .map((item) => {
-          const produto = state.entities.produtos.byId[item.produtoId];
+      const itens = input.itens.reduce<PedidoCompra["itens"]>((acc, item) => {
+        const produto = state.entities.produtos.byId[item.produtoId];
 
-          if (!produto || item.quantidadeSolicitada <= 0 || item.custoUnitario < 0) {
-            return null;
-          }
+        if (!produto || item.quantidadeSolicitada <= 0 || item.custoUnitario < 0) {
+          return acc;
+        }
 
-          return {
-            id: createStoreEntityId("pci"),
-            produtoId: item.produtoId,
-            quantidadeSolicitada: item.quantidadeSolicitada,
-            quantidadeRecebida: 0,
-            unidadeMedida: produto.unidadeMedida,
-            custoUnitario: {
-              valor: item.custoUnitario,
-              moeda: "BRL" as const,
-            },
-          };
-        })
-        .filter((item): item is PedidoCompra["itens"][number] => Boolean(item));
+        acc.push({
+          id: createStoreEntityId("pci"),
+          produtoId: item.produtoId,
+          quantidadeSolicitada: item.quantidadeSolicitada,
+          quantidadeRecebida: 0,
+          unidadeMedida: produto.unidadeMedida,
+          custoUnitario: {
+            valor: item.custoUnitario,
+            moeda: "BRL" as const,
+          },
+        });
+
+        return acc;
+      }, []);
 
       if (!itens.length) {
         return null;
@@ -824,6 +840,7 @@ export const createEstoqueActions: StateCreator<
         tipo: "entrada",
         status: "confirmada",
         origemTipo: "entrada_mercadoria",
+        origemOperacional: input.origemOperacional ?? "reposicao_estoque",
         origemId: entradaId,
         produtoId: input.produtoId,
         depositoDestinoId: input.depositoId,
@@ -988,6 +1005,7 @@ export const createEstoqueActions: StateCreator<
         tipo: "transferencia",
         status: "confirmada",
         origemTipo: "transferencia",
+        origemOperacional: "reposicao_estoque",
         origemId: transferenciaAtual.id,
         produtoId: item.produtoId,
         variacaoId: item.variacaoId,
@@ -1034,6 +1052,8 @@ export const createEstoqueActions: StateCreator<
       const movimentacao: Movimentacao = {
         ...input,
         id: movimentacaoId,
+        origemOperacional:
+          input.origemOperacional ?? getDefaultOrigemOperacional(input.tipo),
         criadoEm: timestamp,
         atualizadoEm: timestamp,
       };
@@ -1087,6 +1107,7 @@ export const createEstoqueActions: StateCreator<
         tipo: "ajuste",
         status: "confirmada",
         origemTipo: "inventario",
+        origemOperacional: input.origemOperacional ?? "ajuste_interno",
         produtoId: input.produtoId,
         depositoOrigemId: input.depositoId,
         quantidade: quantidadeMovimentada,
@@ -1152,6 +1173,7 @@ export const createEstoqueActions: StateCreator<
         tipo: "reserva",
         status: "confirmada",
         origemTipo: "reserva",
+        origemOperacional: input.origemOperacional ?? "pedido_whatsapp",
         origemId: reservaId,
         produtoId: reserva.produtoId,
         variacaoId: reserva.variacaoId,
@@ -1234,6 +1256,7 @@ export const createEstoqueActions: StateCreator<
           tipo: "liberacao_reserva",
           status: "confirmada",
           origemTipo: "reserva",
+          origemOperacional: "ajuste_interno",
           origemId: reservaId,
           produtoId: reservaAtual.produtoId,
           variacaoId: reservaAtual.variacaoId,

@@ -2,61 +2,46 @@
 
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ActionBar } from "@/components/page/action-bar";
 import { EmptyState } from "@/components/page/empty-state";
 import { PageContainer } from "@/components/page/page-container";
 import { SectionHeader } from "@/components/page/section-header";
 import { StatusBadge } from "@/components/page/status-badge";
 import { ContextCard } from "@/modules/estoque/components/context-card";
-import { ProductListFiltersStacked } from "@/modules/estoque/components/product-list-filters-stacked";
-import { ProductRowActions } from "@/modules/estoque/components/product-row-actions";
 import { TablePagination } from "@/modules/estoque/components/table-pagination";
 import {
   calcularEstoqueDisponivel,
   calcularStatusProduto,
   getProdutoStatusLabel,
   getProdutoStatusVariant,
-  verificarEstoqueMinimo,
 } from "@/modules/estoque/helpers";
 import { useEstoqueStore } from "@/modules/estoque/store";
-import type { ProdutoEstoqueStatus } from "@/modules/estoque/types";
 
-type SortField = "nome" | "preco" | "estoqueAtual" | "categoria";
-type SortDirection = "asc" | "desc";
+type ProdutoEstoqueStatus = ReturnType<typeof calcularStatusProduto>;
 
 type ProductRow = {
-  produto: {
-    id: string;
-    nome: string;
-    sku: string;
-    codigoInterno: string;
-    descricao?: string;
-    precoVenda?: {
-      valor: number;
-    };
-    categoriaId: string;
-  };
+  id: string;
+  nome: string;
+  sku: string;
   categoria: string;
-  depositoPrincipal: string;
-  estoqueAtual: number;
+  precoVenda: number;
+  estoqueDisponivel: number;
+  estoqueMinimo: number;
   status: ProdutoEstoqueStatus;
 };
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 8;
+const STATUS_OPTIONS = ["", "Saudável", "Baixo", "Zerado", "Inativo"];
 
 export default function EstoqueProdutosPage() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>("nome");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const deferredSearch = useDeferredValue(search);
-  const filtrosAtivos = useEstoqueStore((state) => state.ui.filtrosAtivos);
+  const statusFilter = useEstoqueStore((state) => String(state.ui.filtrosAtivos.status ?? ""));
   const setFiltroAtivo = useEstoqueStore((state) => state.actions.setFiltroAtivo);
   const produtoIds = useEstoqueStore((state) => state.entities.produtos.allIds);
   const produtosById = useEstoqueStore((state) => state.entities.produtos.byId);
   const categoriasById = useEstoqueStore((state) => state.entities.categorias.byId);
-  const depositosById = useEstoqueStore((state) => state.entities.depositos.byId);
   const saldosById = useEstoqueStore((state) => state.entities.saldosProduto.byId);
 
   const produtos = useMemo(
@@ -65,271 +50,222 @@ export default function EstoqueProdutosPage() {
   );
   const saldos = useMemo(() => Object.values(saldosById), [saldosById]);
 
-  const rows: ProductRow[] = useMemo(
+  const rows = useMemo<ProductRow[]>(
     () =>
-      produtos.map((produto) => {
-        const estoqueAtual = calcularEstoqueDisponivel(produto.id, saldos);
-        const status = calcularStatusProduto(produto, saldos);
-        const depositosProduto = saldos
-          .filter((saldo) => saldo.produtoId === produto.id)
-          .map((saldo) => depositosById[saldo.depositoId]?.nome)
-          .filter(Boolean);
+      produtos
+        .map((produto) => {
+          const status = calcularStatusProduto(produto, saldos);
 
-        return {
-          produto,
-          categoria: categoriasById[produto.categoriaId]?.nome ?? "Sem categoria",
-          depositoPrincipal: depositosProduto[0] ?? "Sem deposito",
-          estoqueAtual,
-          status,
-        };
-      }),
-    [categoriasById, depositosById, produtos, saldos],
+          return {
+            id: produto.id,
+            nome: produto.nome,
+            sku: produto.sku,
+            categoria: categoriasById[produto.categoriaId]?.nome ?? "Sem categoria",
+            precoVenda: produto.precoVenda?.valor ?? 0,
+            estoqueDisponivel: calcularEstoqueDisponivel(produto.id, saldos),
+            estoqueMinimo: produto.estoqueMinimo,
+            status,
+          };
+        })
+        .sort((a, b) => {
+          if (statusWeight(a.status) !== statusWeight(b.status)) {
+            return statusWeight(b.status) - statusWeight(a.status);
+          }
+
+          return a.nome.localeCompare(b.nome, "pt-BR");
+        }),
+    [categoriasById, produtos, saldos],
   );
 
   const normalizedSearch = deferredSearch.trim().toLocaleLowerCase("pt-BR");
-  const categoryFilter = String(filtrosAtivos.categoria ?? "");
-  const statusFilter = String(filtrosAtivos.status ?? "");
-  const depositFilter = String(filtrosAtivos.deposito ?? "");
 
   const filteredRows = useMemo(
     () =>
-      rows.filter(({ produto, categoria, depositoPrincipal, status }) => {
+      rows.filter((row) => {
         const matchesSearch = normalizedSearch
-          ? [produto.nome, produto.sku, produto.codigoInterno].some((value) =>
+          ? [row.nome, row.sku].some((value) =>
               value.toLocaleLowerCase("pt-BR").includes(normalizedSearch),
             )
           : true;
-        const matchesCategory = categoryFilter ? categoria === categoryFilter : true;
-        const matchesStatus = statusFilter ? getProdutoStatusLabel(status) === statusFilter : true;
-        const matchesDeposit = depositFilter ? depositoPrincipal === depositFilter : true;
+        const matchesStatus = statusFilter
+          ? getProdutoStatusLabel(row.status) === statusFilter
+          : true;
 
-        return matchesSearch && matchesCategory && matchesStatus && matchesDeposit;
+        return matchesSearch && matchesStatus;
       }),
-    [categoryFilter, depositFilter, normalizedSearch, rows, statusFilter],
-  );
-
-  const sortedRows = useMemo(
-    () =>
-      [...filteredRows]
-        .map((row, index) => ({ row, index }))
-        .sort((a, b) => {
-          const direction = sortDirection === "asc" ? 1 : -1;
-
-          if (sortField === "nome") {
-            const result = a.row.produto.nome.localeCompare(b.row.produto.nome, "pt-BR");
-            return result === 0 ? a.index - b.index : result * direction;
-          }
-
-          if (sortField === "categoria") {
-            const result = a.row.categoria.localeCompare(b.row.categoria, "pt-BR");
-            return result === 0 ? a.index - b.index : result * direction;
-          }
-
-          if (sortField === "preco") {
-            const result =
-              (a.row.produto.precoVenda?.valor ?? 0) - (b.row.produto.precoVenda?.valor ?? 0);
-            return result === 0 ? a.index - b.index : result * direction;
-          }
-
-          const result = a.row.estoqueAtual - b.row.estoqueAtual;
-          return result === 0 ? a.index - b.index : result * direction;
-        })
-        .map(({ row }) => row),
-    [filteredRows, sortDirection, sortField],
+    [normalizedSearch, rows, statusFilter],
   );
 
   const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE)),
-    [sortedRows.length],
+    () => Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE)),
+    [filteredRows.length],
   );
   const paginatedRows = useMemo(
-    () => sortedRows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [currentPage, sortedRows],
+    () => filteredRows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [currentPage, filteredRows],
   );
-  const categories = useMemo(() => [...new Set(rows.map((item) => item.categoria))], [rows]);
-  const statuses = useMemo(
-    () => [...new Set(rows.map((item) => getProdutoStatusLabel(item.status)))],
-    [rows],
-  );
-  const deposits = useMemo(
-    () => [...new Set(rows.map((item) => item.depositoPrincipal))],
-    [rows],
-  );
+
   const produtosAbaixoMinimo = useMemo(
-    () => produtos.filter((produto) => verificarEstoqueMinimo(produto, saldos)).length,
-    [produtos, saldos],
+    () => rows.filter((row) => row.status === "baixo").length,
+    [rows],
+  );
+  const produtosZerados = useMemo(
+    () => rows.filter((row) => row.status === "zerado").length,
+    [rows],
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, categoryFilter, statusFilter, depositFilter, sortField, sortDirection]);
+  }, [search, statusFilter]);
+
+  useEffect(() => {
+    setFiltroAtivo("categoria", undefined);
+    setFiltroAtivo("deposito", undefined);
+  }, [setFiltroAtivo]);
 
   return (
     <PageContainer>
       <SectionHeader
         title="Produtos"
-        description="Consulte o catálogo operacional com dados comerciais, estoque atual e estrutura preparada para regras futuras."
+        description="Consulte preço, estoque disponível e itens que pedem reposição sem perder tempo."
         actions={[{ label: "Novo produto" }]}
       />
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-4 lg:grid-cols-3">
         <ContextCard
-          title="Catálogo ativo"
-          value={`${produtos.length} itens`}
-          description="Base disponível para venda, compra e controle interno do estoque."
+          title="Produtos cadastrados"
+          value={String(produtos.length)}
+          description="Base atual de itens disponíveis para venda e controle."
         />
         <ContextCard
-          title="Itens abaixo do mínimo"
-          value={`${produtosAbaixoMinimo} alertas`}
-          description="Produtos que merecem revisão imediata antes da próxima ruptura."
+          title="Abaixo do mínimo"
+          value={String(produtosAbaixoMinimo)}
+          description="Itens acabando e pedindo reposição."
         />
         <ContextCard
-          title="Categorias monitoradas"
-          value={`${categories.length} grupos`}
-          description="Classificação operacional usada para leitura rápida do catálogo."
+          title="Produtos zerados"
+          value={String(produtosZerados)}
+          description="Itens sem saldo disponível para vender."
         />
       </section>
 
-      <ActionBar
-        items={[
-          { label: "Novo produto" },
-          { label: "Importar planilha", tone: "neutral" },
-          { label: "Exportar lista", tone: "neutral" },
-        ]}
-      />
+      <section className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--shadow-sm)]">
+        <div className="grid gap-4 lg:grid-cols-[1fr_220px]">
+          <label className="space-y-2">
+            <span className="text-sm font-medium text-[var(--color-text)]">Buscar</span>
+            <input
+              type="search"
+              placeholder="Nome ou SKU"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="h-12 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none transition-all focus:border-[var(--color-primary)] focus:bg-white"
+            />
+          </label>
 
-      <ProductListFiltersStacked
-        categories={categories}
-        statuses={statuses}
-        deposits={deposits}
-        searchValue={search}
-        onSearchChange={setSearch}
-        selectedCategory={categoryFilter}
-        selectedStatus={statusFilter}
-        selectedDeposit={depositFilter}
-        onCategoryChange={(value) => setFiltroAtivo("categoria", value || undefined)}
-        onStatusChange={(value) => setFiltroAtivo("status", value || undefined)}
-        onDepositChange={(value) => setFiltroAtivo("deposito", value || undefined)}
-      />
+          <label className="space-y-2">
+            <span className="text-sm font-medium text-[var(--color-text)]">Status do estoque</span>
+            <select
+              value={statusFilter}
+              onChange={(event) =>
+                setFiltroAtivo("status", event.target.value || undefined)
+              }
+              className="h-12 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-sm text-[var(--color-text)] outline-none transition-all focus:border-[var(--color-primary)] focus:bg-white"
+            >
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option || "todos"} value={option}>
+                  {option || "Todos"}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </section>
 
       <section className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--shadow-sm)]">
         <div className="mb-4 flex flex-col gap-2 px-2 pt-2 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-[var(--color-text)]">
-              Catálogo operacional
-            </h2>
+            <h2 className="text-lg font-semibold text-[var(--color-text)]">Lista de produtos</h2>
             <p className="text-sm text-[var(--color-text-soft)]">
-              Visão consolidada dos itens cadastrados e seus respectivos saldos.
+              Os itens críticos aparecem primeiro para facilitar a decisão do dia.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <StatusBadge variant="info">{produtos.length} produtos</StatusBadge>
-            <StatusBadge variant="warning">{produtosAbaixoMinimo} com atenção</StatusBadge>
+            <StatusBadge variant="warning">{produtosAbaixoMinimo} abaixo do mínimo</StatusBadge>
+            <StatusBadge variant="danger">{produtosZerados} zerados</StatusBadge>
           </div>
         </div>
 
-        {sortedRows.length ? (
+        {filteredRows.length ? (
           <div className="overflow-hidden rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]">
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse">
                 <thead>
                   <tr className="border-b border-[var(--color-border)] bg-[#f8fafc]">
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-                      SKU
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-                      Código
-                    </th>
-                    <SortableHeader
-                      label="Nome"
-                      active={sortField === "nome"}
-                      direction={sortDirection}
-                      onClick={() =>
-                        handleSort("nome", sortField, sortDirection, setSortField, setSortDirection)
-                      }
-                    />
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-                      Descrição curta
-                    </th>
-                    <SortableHeader
-                      label="Categoria"
-                      active={sortField === "categoria"}
-                      direction={sortDirection}
-                      onClick={() =>
-                        handleSort(
-                          "categoria",
-                          sortField,
-                          sortDirection,
-                          setSortField,
-                          setSortDirection,
-                        )
-                      }
-                    />
-                    <SortableHeader
-                      label="Preço"
-                      active={sortField === "preco"}
-                      direction={sortDirection}
-                      onClick={() =>
-                        handleSort("preco", sortField, sortDirection, setSortField, setSortDirection)
-                      }
-                    />
-                    <SortableHeader
-                      label="Estoque atual"
-                      active={sortField === "estoqueAtual"}
-                      direction={sortDirection}
-                      onClick={() =>
-                        handleSort(
-                          "estoqueAtual",
-                          sortField,
-                          sortDirection,
-                          setSortField,
-                          setSortDirection,
-                        )
-                      }
-                    />
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-                      Ações
-                    </th>
+                    {[
+                      "Produto",
+                      "SKU",
+                      "Categoria",
+                      "Preço de venda",
+                      "Estoque disponível",
+                      "Estoque mínimo",
+                      "Status do estoque",
+                      "Ação",
+                    ].map((header) => (
+                      <th
+                        key={header}
+                        className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]"
+                      >
+                        {header}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedRows.map(({ produto, categoria, estoqueAtual, status }) => (
+                  {paginatedRows.map((row) => (
                     <tr
-                      key={produto.id}
-                      className="border-b border-[var(--color-border)] last:border-b-0 transition-colors hover:bg-[#f8fbff]"
+                      key={row.id}
+                      className={[
+                        "border-b border-[var(--color-border)] last:border-b-0 transition-colors hover:bg-[#f8fbff]",
+                        row.status === "zerado"
+                          ? "bg-red-50/70"
+                          : row.status === "baixo"
+                            ? "bg-yellow-50/60"
+                            : "bg-white",
+                      ].join(" ")}
                     >
-                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">{produto.sku}</td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">
-                        {produto.codigoInterno}
-                      </td>
                       <td className="px-6 py-4 text-sm">
-                        <Link
-                          href={`/estoque/produtos/${produto.id}`}
-                          className="font-medium text-[var(--color-primary)]"
-                        >
-                          {produto.nome}
-                        </Link>
+                        <div className="space-y-1">
+                          <Link
+                            href={`/estoque/produtos/${row.id}`}
+                            className="font-medium text-[var(--color-primary)]"
+                          >
+                            {row.nome}
+                          </Link>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">{row.sku}</td>
+                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">{row.categoria}</td>
+                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">
+                        {formatCurrency(row.precoVenda)}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-[var(--color-text)]">
+                        {row.estoqueDisponivel}
                       </td>
                       <td className="px-6 py-4 text-sm text-[var(--color-text-soft)]">
-                        {produto.descricao ?? "-"}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">{categoria}</td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">
-                        {formatCurrency(produto.precoVenda?.valor ?? 0)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[var(--color-text)]">
-                        {estoqueAtual}
+                        {row.estoqueMinimo}
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <StatusBadge variant={getProdutoStatusVariant(status)}>
-                          {getProdutoStatusLabel(status)}
+                        <StatusBadge variant={getProdutoStatusVariant(row.status)}>
+                          {getProdutoStatusLabel(row.status)}
                         </StatusBadge>
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <ProductRowActions id={produto.id} />
+                        <Link
+                          href={`/estoque/produtos/${row.id}/editar`}
+                          className="inline-flex rounded-xl border border-[var(--color-border)] bg-white px-3 py-2 text-xs font-medium text-[var(--color-primary)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[var(--color-surface-alt)]"
+                        >
+                          Editar
+                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -340,7 +276,7 @@ export default function EstoqueProdutosPage() {
             <TablePagination
               currentPage={currentPage}
               totalPages={totalPages}
-              totalItems={sortedRows.length}
+              totalItems={filteredRows.length}
               pageSize={PAGE_SIZE}
               itemLabel="produtos"
               onPageChange={setCurrentPage}
@@ -348,15 +284,11 @@ export default function EstoqueProdutosPage() {
           </div>
         ) : (
           <EmptyState
-            title={
-              search || categoryFilter || statusFilter || depositFilter
-                ? "Nenhum produto encontrado"
-                : "Nenhum produto cadastrado"
-            }
+            title={search || statusFilter ? "Nenhum produto encontrado" : "Nenhum produto cadastrado"}
             description={
-              search || categoryFilter || statusFilter || depositFilter
-                ? "Nenhum item corresponde aos filtros aplicados."
-                : "Assim que os primeiros itens forem adicionados, a lista aparecerá aqui com filtros, ações e paginação."
+              search || statusFilter
+                ? "Tente buscar por outro nome, SKU ou ajustar o status filtrado."
+                : "Quando os primeiros produtos forem cadastrados, eles aparecem aqui."
             }
             actionLabel="Cadastrar produto"
           />
@@ -375,40 +307,9 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-function SortableHeader({
-  label,
-  active,
-  direction,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  direction: SortDirection;
-  onClick: () => void;
-}) {
-  return (
-    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-      <button type="button" onClick={onClick} className="inline-flex items-center gap-2">
-        <span>{label}</span>
-        <span>{active ? (direction === "asc" ? "↑" : "↓") : "↕"}</span>
-      </button>
-    </th>
-  );
+function statusWeight(status: ProdutoEstoqueStatus) {
+  if (status === "zerado") return 3;
+  if (status === "baixo") return 2;
+  if (status === "inativo") return 1;
+  return 0;
 }
-
-function handleSort(
-  field: SortField,
-  currentField: SortField,
-  currentDirection: SortDirection,
-  setField: (value: SortField) => void,
-  setDirection: (value: SortDirection) => void,
-) {
-  if (field === currentField) {
-    setDirection(currentDirection === "asc" ? "desc" : "asc");
-    return;
-  }
-
-  setField(field);
-  setDirection("asc");
-}
-

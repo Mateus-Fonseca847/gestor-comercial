@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionBar } from "@/components/page/action-bar";
 import { DataTable } from "@/components/page/data-table";
@@ -20,7 +20,7 @@ export function ModuleDashboardScreen({ moduleKey }: { moduleKey: ModuleKey }) {
   const config = moduleDashboards[moduleKey];
   const nav = moduleNavigation.find((item) => item.href === `/${moduleKey}`);
 
-  if (!config || !nav) {
+  if (!config || !nav || !nav.menu) {
     notFound();
   }
 
@@ -38,7 +38,7 @@ export function ModuleDashboardScreen({ moduleKey }: { moduleKey: ModuleKey }) {
         <article className="rounded-[30px] border border-[var(--color-border)] bg-[linear-gradient(135deg,#ffffff_0%,#edf4ff_62%,#d9e8ff_100%)] p-7">
           <div className="max-w-2xl space-y-5">
             <div className="inline-flex rounded-full border border-[var(--color-border)] bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-soft)]">
-              Centro do módulo
+              Painel da área
             </div>
             <div className="space-y-2">
               <h2 className="text-3xl font-semibold tracking-tight text-[var(--color-primary)]">
@@ -64,10 +64,10 @@ export function ModuleDashboardScreen({ moduleKey }: { moduleKey: ModuleKey }) {
         <article className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_12px_30px_rgba(0,74,173,0.06)]">
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-[var(--color-primary)]">
-              Atalhos do módulo
+              Atalhos da rotina
             </h2>
             <p className="text-sm text-[var(--color-text-soft)]">
-              Navegação rápida para as áreas principais desta seção.
+              Acesso rápido ao que você mais usa no dia.
             </p>
           </div>
           <div className="space-y-3">
@@ -150,19 +150,19 @@ export function ModuleCollectionScreen({
               {config.title}
             </h2>
             <p className="text-sm text-[var(--color-text-soft)]">
-              Área principal com registros simulados para validar navegação e hierarquia.
+              Lista principal da área, pronta para acompanhar o dia da loja.
             </p>
           </div>
-          <StatusBadge variant="info">{config.rows.length} registros</StatusBadge>
+          <StatusBadge variant="info">{config.rows.length} itens</StatusBadge>
         </div>
 
         <DataTable
           columns={columns}
-          data={config.rows}
+          data={config.rows as Array<{ id: string | number } & Record<string, string | number>>}
           emptyState={
             <EmptyState
-              title={`Nenhum registro em ${config.title.toLowerCase()}`}
-              description="Esta área está pronta para receber dados reais quando a camada de backend for conectada."
+              title={`Nada encontrado em ${config.title.toLowerCase()}`}
+              description="Ainda não há itens aqui. Assim que você começar a usar esta área, tudo aparece nesta lista."
               actionLabel={config.actionLabel}
             />
           }
@@ -170,6 +170,16 @@ export function ModuleCollectionScreen({
       </section>
     </PageContainer>
   );
+}
+
+export function ModuleChildScreen({
+  moduleKey,
+  slug,
+}: {
+  moduleKey: ModuleKey;
+  slug: string;
+}) {
+  return <ModuleCollectionScreen moduleKey={moduleKey} slug={slug} />;
 }
 
 export function ModuleReportsScreen({ moduleKey }: { moduleKey: ModuleKey }) {
@@ -183,14 +193,14 @@ export function ModuleReportsScreen({ moduleKey }: { moduleKey: ModuleKey }) {
     <PageContainer>
       <SectionHeader
         title={`Relatórios de ${nav.label.toLowerCase()}`}
-        description={`Explore leituras executivas e operacionais do módulo de ${nav.label.toLowerCase()}.`}
+        description={`Acompanhe os principais números de ${nav.label.toLowerCase()} sem complicação.`}
         actions={[{ label: "Gerar relatório" }]}
       />
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <StatCard label="Modelos disponíveis" value="5" description="Conjunto inicial de relatórios configurados no módulo." />
-        <StatCard label="Atualização" value="15 min" description="Frequência simulada de consolidação visual." />
-        <StatCard label="Exportações" value="PDF / XLS" description="Formatos previstos para expansão futura." />
+        <StatCard label="Relatórios prontos" value="5" description="Leituras rápidas para acompanhar a rotina da loja." />
+        <StatCard label="Atualização" value="15 min" description="Dados renovados para apoiar a operação do dia." />
+        <StatCard label="Exportação" value="PDF / XLS" description="Formatos previstos para compartilhar quando precisar." />
       </section>
 
       <ActionBar items={[{ label: "Gerar relatório" }, { label: "Exportar visão", tone: "neutral" }]} />
@@ -198,18 +208,18 @@ export function ModuleReportsScreen({ moduleKey }: { moduleKey: ModuleKey }) {
         placeholder={`Buscar relatórios de ${nav.label.toLowerCase()}`}
         chips={[
           { label: "Todos", active: true },
-          { label: "Executivos" },
-          { label: "Operacionais" },
+          { label: "Resumo" },
+          { label: "Dia a dia" },
         ]}
       />
 
       <section className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_12px_30px_rgba(0,74,173,0.06)]">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-[var(--color-primary)]">
-            Catálogo de relatórios
+            Relatórios da área
           </h2>
           <p className="text-sm text-[var(--color-text-soft)]">
-            Relatórios disponíveis para leitura gerencial e acompanhamento operacional.
+            Leituras rápidas para vender melhor, comprar certo e manter a loja rodando.
           </p>
         </div>
 
@@ -244,9 +254,27 @@ export function ModuleReportsScreen({ moduleKey }: { moduleKey: ModuleKey }) {
 
 function reportItems(label: string) {
   return [
-    { title: "Resumo executivo", description: `Visão consolidada com indicadores principais de ${label.toLowerCase()}.`, cadence: "Semanal", owner: "Gestão", status: "Disponível" },
-    { title: "Acompanhamento operacional", description: "Leitura detalhada das rotinas e exceções da área.", cadence: "Diário", owner: "Operações", status: "Disponível" },
-    { title: "Análise histórica", description: "Comparativo por período para apoio a decisões futuras.", cadence: "Mensal", owner: "Coordenação", status: "Em preparação" },
+    {
+      title: "Resumo da operação",
+      description: `Visão rápida com os números principais de ${label.toLowerCase()}.`,
+      cadence: "Semanal",
+      owner: "Gestão",
+      status: "Disponível",
+    },
+    {
+      title: "Acompanhamento do dia",
+      description: "Leitura direta do que está acontecendo agora na operação.",
+      cadence: "Diário",
+      owner: "Operação",
+      status: "Disponível",
+    },
+    {
+      title: "Comparativo por período",
+      description: "Compare resultados para entender o ritmo de vendas e reposição.",
+      cadence: "Mensal",
+      owner: "Coordenação",
+      status: "Em preparação",
+    },
   ];
 }
 
