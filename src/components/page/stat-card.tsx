@@ -4,11 +4,18 @@ type StatCardProps = {
   label: string;
   value: string;
   description: string;
+  onClick?: () => void;
 };
 
-export function StatCard({ label, value, description }: StatCardProps) {
+export function StatCard({ label, value, description, onClick }: StatCardProps) {
   return (
-    <article className="rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <article
+      onClick={onClick}
+      className={[
+        "rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        onClick ? "cursor-pointer" : "",
+      ].join(" ")}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-4">
           <p className="text-sm font-medium text-[var(--color-text-soft)]">{label}</p>

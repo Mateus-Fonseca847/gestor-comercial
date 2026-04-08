@@ -1,11 +1,12 @@
-﻿"use client";
+"use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 import { PageContainer } from "@/components/page/page-container";
-import { SectionHeader } from "@/components/page/section-header";
 import { StatusBadge } from "@/components/page/status-badge";
 import { DashboardActivityList } from "@/modules/estoque/components/dashboard-activity-list";
 import { DashboardKpiTile } from "@/modules/estoque/components/dashboard-kpi-tile";
+import { StockEvolutionChart } from "@/modules/estoque/components/stock-evolution-chart";
 import {
   calcularEstoqueDisponivel,
   calcularStatusProduto,
@@ -17,30 +18,25 @@ import {
   getProdutoStatusVariant,
 } from "@/modules/estoque/helpers";
 import { useEstoqueEntityList } from "@/modules/estoque/store";
-import { QuickActionsPanel } from "@/modules/shared/components/quick-actions-panel";
-import {
-  MessageCircleMore,
-  PackagePlus,
-  Receipt,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
+
+type ProdutoSemGiro = {
+  id: string;
+  nome: string;
+  estoqueDisponivel: number;
+  estoqueMinimo: number;
+  ultimaMovimentacaoEm?: string;
+  status: ReturnType<typeof calcularStatusProduto>;
+};
 
 export function EstoqueDashboardPage() {
+  const [buscaProduto, setBuscaProduto] = useState("");
   const produtos = useEstoqueEntityList("produtos");
   const movimentacoes = useEstoqueEntityList("movimentacoes");
   const saldos = useEstoqueEntityList("saldosProduto");
 
   const agora = Date.now();
   const corteSemGiro = agora - 60 * 24 * 60 * 60 * 1000;
-  type ProdutoSemGiro = {
-    id: string;
-    nome: string;
-    estoqueDisponivel: number;
-    estoqueMinimo: number;
-    ultimaMovimentacaoEm?: string;
-    status: ReturnType<typeof calcularStatusProduto>;
-  };
+  const buscaNormalizada = buscaProduto.trim().toLowerCase();
 
   const produtosBaixoEstoque = useMemo(
     () => produtos.filter((produto) => calcularStatusProduto(produto, saldos) === "baixo"),
@@ -50,11 +46,6 @@ export function EstoqueDashboardPage() {
   const produtosZerados = useMemo(
     () => produtos.filter((produto) => calcularStatusProduto(produto, saldos) === "zerado"),
     [produtos, saldos],
-  );
-
-  const itensReservados = useMemo(
-    () => saldos.reduce((total, saldo) => total + saldo.quantidadeReservada, 0),
-    [saldos],
   );
 
   const produtosSemGiro = useMemo(() => {
@@ -131,15 +122,17 @@ export function EstoqueDashboardPage() {
         context: "Visão da loja",
         tone: "info" as const,
       },
-      {
-        label: "Itens reservados",
-        value: String(itensReservados),
-        note: "Separados para pedidos em aberto.",
-        context: itensReservados ? "Conferir disponível" : "Sem reserva",
-        tone: itensReservados ? ("warning" as const) : ("neutral" as const),
-      },
     ],
-    [itensReservados, produtos, produtosBaixoEstoque.length, produtosZerados.length, saldos],
+    [produtos, produtosBaixoEstoque.length, produtosZerados.length, saldos],
+  );
+
+  const produtosPorId = useMemo(
+    () =>
+      produtos.reduce<Record<string, (typeof produtos)[number]>>((acc, produto) => {
+        acc[produto.id] = produto;
+        return acc;
+      }, {}),
+    [produtos],
   );
 
   const movimentacoesRecentes = useMemo(
@@ -155,108 +148,130 @@ export function EstoqueDashboardPage() {
             new Date(b.dataMovimentacao).getTime() - new Date(a.dataMovimentacao).getTime(),
         )
         .slice(0, 6)
-        .map((item) => ({
-          id: item.id,
-          title: `${formatMovimentacaoTipo(item.tipo)} • ${item.quantidade} ${item.unidadeMedida}`,
-          summary: item.observacao ?? "Movimentação registrada sem observação.",
-          meta: `${formatDateBR(item.dataMovimentacao, true)} • ${formatMovimentacaoStatus(item.status)}`,
-          aside: (
-            <StatusBadge variant={item.tipo === "entrada" ? "info" : item.tipo === "ajuste" ? "warning" : "danger"}>
-              {formatMovimentacaoTipo(item.tipo)}
-            </StatusBadge>
-          ),
-        })),
-    [movimentacoes],
+        .map((item) => {
+          const produto = produtosPorId[item.produtoId];
+
+          return {
+            id: item.id,
+            title: produto?.nome ?? "Produto sem identificação",
+            summary: `${formatMovimentacaoTipo(item.tipo)} • ${item.quantidade} ${item.unidadeMedida}`,
+            meta: `${formatDateBR(item.dataMovimentacao, true)} • ${formatMovimentacaoStatus(item.status)}`,
+            aside: (
+              <StatusBadge
+                variant={
+                  item.tipo === "entrada"
+                    ? "info"
+                    : item.tipo === "ajuste"
+                      ? "warning"
+                      : "danger"
+                }
+              >
+                {formatMovimentacaoTipo(item.tipo)}
+              </StatusBadge>
+            ),
+          };
+        }),
+    [movimentacoes, produtosPorId],
   );
 
-  const acoesRapidas = [
-    {
-      label: "Nova venda",
-      description: "Abrir venda rápida sem sair da rotina.",
-      href: "/vendas/nova",
-      icon: ShoppingCart,
-    },
-    {
-      label: "Novo pedido WhatsApp",
-      description: "Registrar atendimento do canal digital.",
-      href: "/vendas/nova?canal=whatsapp",
-      icon: MessageCircleMore,
-    },
-    {
-      label: "Novo cliente",
-      description: "Cadastrar cliente para vender melhor.",
-      href: "/cadastros/clientes",
-      icon: Users,
-    },
-    {
-      label: "Novo produto",
-      description: "Cadastrar item novo para a loja.",
-      href: "/estoque/produtos/novo",
-      icon: PackagePlus,
-    },
-    {
-      label: "Registrar entrada de estoque",
-      description: "Dar entrada no que acabou de chegar.",
-      href: "/estoque/entradas",
-      icon: Receipt,
-    },
-    {
-      label: "Ver reposição",
-      description: "Abrir os itens que pedem compra.",
-      href: "/estoque/reposicao",
-      icon: PackagePlus,
-    },
-  ];
+  const produtosSemGiroFiltrados = useMemo(() => {
+    if (!buscaNormalizada) {
+      return produtosSemGiro;
+    }
+
+    return produtosSemGiro.filter((produto) =>
+      produto.nome.toLowerCase().includes(buscaNormalizada),
+    );
+  }, [buscaNormalizada, produtosSemGiro]);
+
+  const movimentacoesRecentesFiltradas = useMemo(() => {
+    if (!buscaNormalizada) {
+      return movimentacoesRecentes;
+    }
+
+    return movimentacoesRecentes.filter((movimentacao) =>
+      `${movimentacao.title} ${movimentacao.summary ?? ""}`
+        .toLowerCase()
+        .includes(buscaNormalizada),
+    );
+  }, [buscaNormalizada, movimentacoesRecentes]);
 
   return (
     <PageContainer>
-      <SectionHeader
-        title="Resumo do estoque"
-        description="Veja rápido o que está acabando, o que zerou e as últimas movimentações da loja."
-      />
+      <section className="space-y-6">
+        <div className="space-y-2 px-1">
+          <h1 className="text-[2.15rem] font-semibold tracking-[-0.03em] text-[var(--color-text)]">
+            Estoque
+          </h1>
+          <p className="max-w-2xl text-sm leading-6 text-[var(--color-text-soft)]">
+            Acompanhe o saldo da loja, identifique risco de ruptura e leia o histórico mais recente da operação.
+          </p>
+        </div>
 
-      <section className="grid gap-4 lg:grid-cols-3 xl:grid-cols-5">
-        {kpis.map((metric) => (
-          <DashboardKpiTile
-            key={metric.label}
-            label={metric.label}
-            value={metric.value}
-            note={metric.note}
-            context={metric.context}
-            tone={metric.tone}
-          />
-        ))}
+        <section className="grid gap-6 xl:grid-cols-[1.5fr_0.82fr] xl:items-stretch">
+          <StockEvolutionChart />
+
+          <aside className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+            {kpis.map((metric) => (
+              <DashboardKpiTile
+                key={metric.label}
+                label={metric.label}
+                value={metric.value}
+                note={metric.note}
+                context={metric.context}
+                tone={metric.tone}
+              />
+            ))}
+          </aside>
+        </section>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <QuickActionsPanel
-          title="Ações rápidas"
-          description="Atalhos do dia para vender, atender e repor com menos cliques."
-          items={acoesRapidas}
-        />
+      <section className="rounded-[30px] border border-[rgba(15,23,42,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,252,0.96)_100%)] p-5 shadow-[0_18px_44px_rgba(15,23,42,0.08)] md:p-6">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-[var(--color-text)]">Busca rápida</p>
+            <p className="text-sm text-[var(--color-text-soft)]">
+              Procure um produto e filtre os blocos operacionais abaixo.
+            </p>
+          </div>
+        </div>
+        <label className="flex h-14 items-center gap-3 rounded-[20px] border border-[rgba(148,163,184,0.2)] bg-white px-4 text-[var(--color-text-soft)] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] transition-all duration-200 focus-within:border-[var(--color-primary)] focus-within:shadow-[0_0_0_4px_rgba(37,99,235,0.08)]">
+          <Search className="h-4 w-4 shrink-0" />
+          <input
+            type="search"
+            value={buscaProduto}
+            onChange={(event) => setBuscaProduto(event.target.value)}
+            placeholder="Buscar produto no estoque"
+            className="w-full border-0 bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-soft)]"
+          />
+        </label>
+      </section>
 
-        <article className="rounded-[30px] border border-[var(--color-border)]/90 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-6 shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold text-[var(--color-text)]">Produtos sem giro recente</h2>
-              <p className="text-sm text-[var(--color-text-soft)]">
-                Itens com saldo parado há pelo menos 60 dias.
+      <section className="grid gap-6 xl:grid-cols-2 xl:items-start">
+        <article className="rounded-[32px] border border-[rgba(15,23,42,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,252,0.96)_100%)] p-6 shadow-[0_18px_44px_rgba(15,23,42,0.08)] md:p-7">
+          <div className="mb-6 flex items-start justify-between gap-4 border-b border-[rgba(148,163,184,0.18)] pb-4">
+            <div className="space-y-1.5">
+              <h2 className="text-[1.05rem] font-semibold tracking-tight text-[var(--color-text)]">
+                Produtos sem giro recente
+              </h2>
+              <p className="text-sm leading-6 text-[var(--color-text-soft)]">
+                Itens com saldo parado há pelo menos 60 dias e que pedem revisão da loja.
               </p>
             </div>
-            <StatusBadge variant={produtosSemGiro.length ? "warning" : "success"}>
-              {produtosSemGiro.length ? "Acompanhar" : "Em dia"}
+            <StatusBadge variant={produtosSemGiroFiltrados.length ? "warning" : "success"}>
+              {produtosSemGiroFiltrados.length ? "Acompanhar" : "Em dia"}
             </StatusBadge>
           </div>
 
-          <div className="space-y-3">
-            {produtosSemGiro.length ? (
-              produtosSemGiro.map((produto) => (
+          <div className="space-y-3.5">
+            {produtosSemGiroFiltrados.length ? (
+              produtosSemGiroFiltrados.map((produto) => (
                 <div
                   key={produto.id}
-                  className="flex flex-col gap-3 rounded-[22px] border border-[var(--color-border)]/80 bg-[var(--color-surface-alt)] px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
+                  className="flex flex-col gap-3 rounded-[24px] border border-[rgba(148,163,184,0.18)] bg-white/88 px-5 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(15,23,42,0.06)] lg:flex-row lg:items-center lg:justify-between"
                 >
-                  <div className="space-y-1">
-                    <p className="font-medium text-[var(--color-text)]">{produto.nome}</p>
+                  <div className="space-y-1.5">
+                    <p className="text-[0.98rem] font-semibold text-[var(--color-text)]">{produto.nome}</p>
                     <p className="text-sm text-[var(--color-text-soft)]">
                       Disponível {produto.estoqueDisponivel} • Mínimo {produto.estoqueMinimo}
                     </p>
@@ -272,20 +287,27 @@ export function EstoqueDashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-5 py-8 text-sm text-[var(--color-text-soft)]">
-                Nenhum produto parado no momento.
+              <div className="rounded-[24px] border border-dashed border-[rgba(148,163,184,0.3)] bg-[rgba(248,250,252,0.88)] px-5 py-10 text-sm text-[var(--color-text-soft)]">
+                {buscaNormalizada
+                  ? "Nenhum produto encontrado para essa busca."
+                  : "Nenhum produto parado no momento."}
               </div>
             )}
           </div>
         </article>
-      </section>
 
-      <DashboardActivityList
-        title="Últimas movimentações"
-        description="Entradas, saídas e ajustes mais recentes do estoque."
-        href="/estoque/movimentacoes"
-        items={movimentacoesRecentes}
-      />
+        <DashboardActivityList
+          title="Últimas movimentações"
+          description="Entradas, saídas e ajustes mais recentes para leitura rápida da operação."
+          href="/estoque/movimentacoes"
+          items={movimentacoesRecentesFiltradas}
+          emptyMessage={
+            buscaNormalizada
+              ? "Nenhuma movimentação encontrada para essa busca."
+              : "Nenhuma movimentação recente no momento."
+          }
+        />
+      </section>
     </PageContainer>
   );
 }

@@ -5,7 +5,9 @@ import { CommercialOrderForm } from "@/modules/vendas/components/commercial-orde
 
 export function NovaVendaPage() {
   const searchParams = useSearchParams();
-  const canal = searchParams.get("canal") === "whatsapp" ? "whatsapp" : "loja";
+  const canalParam = searchParams.get("canal");
+  const canal =
+    canalParam === "online" || canalParam === "whatsapp" ? "online" : "loja_fisica";
 
   return <CommercialOrderForm defaultCanal={canal} />;
 }

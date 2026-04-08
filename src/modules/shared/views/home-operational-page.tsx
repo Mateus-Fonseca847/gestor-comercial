@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { MessageCircleMore, PackagePlus, Receipt, ShoppingCart, Users } from "lucide-react";
+import { PackagePlus, Receipt, ShoppingCart, Users } from "lucide-react";
 import { ActionBar } from "@/components/page/action-bar";
 import { PageContainer } from "@/components/page/page-container";
 import { SectionHeader } from "@/components/page/section-header";
@@ -16,12 +16,6 @@ const quickActions = [
     description: "Abrir o caixa e registrar uma venda agora.",
     href: "/vendas/nova",
     icon: ShoppingCart,
-  },
-  {
-    label: "Novo pedido WhatsApp",
-    description: "Registrar pedido recebido no atendimento.",
-    href: "/vendas/nova?canal=whatsapp",
-    icon: MessageCircleMore,
   },
   {
     label: "Novo cliente",
@@ -75,7 +69,6 @@ export function HomeOperationalPage() {
       <ActionBar
         items={[
           { label: "Nova venda", href: "/vendas/nova" },
-          { label: "Novo pedido WhatsApp", tone: "neutral", href: "/vendas/nova?canal=whatsapp" },
           { label: "Registrar entrada de estoque", tone: "neutral", href: "/estoque/entradas" },
         ]}
       />
@@ -163,9 +156,9 @@ export function HomeOperationalPage() {
           note="Quantidade de vendas registradas."
         />
         <DashboardKpiCard
-          label="Pedidos WhatsApp"
-          value={String(channelSummary.find((item) => item.canal === "WhatsApp")?.quantidadePedidos ?? 0)}
-          note="Pedidos do canal digital."
+          label="Vendas online"
+          value={String(channelSummary.find((item) => item.canal === "Online")?.quantidadePedidos ?? 0)}
+          note="Registros do canal online."
         />
         <DashboardKpiCard
           label="Estoque baixo"
@@ -196,7 +189,7 @@ export function HomeOperationalPage() {
             <div>
               <h2 className="text-lg font-semibold text-[var(--color-text)]">Pedidos por canal</h2>
               <p className="text-sm text-[var(--color-text-soft)]">
-                Bloco pronto para consolidar pedidos da loja e do WhatsApp.
+                Bloco pronto para consolidar vendas da loja física e do online.
               </p>
             </div>
             <StatusBadge variant="info">Hoje</StatusBadge>
@@ -229,7 +222,7 @@ export function HomeOperationalPage() {
             title: client.nome,
             meta: client.meta,
             aside: (
-              <StatusBadge variant={client.origem === "WhatsApp" ? "info" : "success"}>
+              <StatusBadge variant={client.origem === "Online" ? "info" : "success"}>
                 {client.origem}
               </StatusBadge>
             ),
@@ -259,7 +252,7 @@ export function HomeOperationalPage() {
 
         <DashboardListBlock
           title="Movimentacoes ligadas a operacao comercial"
-          description="Entradas, saidas e reservas relacionadas a venda, WhatsApp e reposicao."
+          description="Entradas, saidas e reservas relacionadas a vendas e reposicao."
           href="/estoque/movimentacoes"
           items={commercialStockMovements.map((item) => ({
             id: item.id,
@@ -276,9 +269,9 @@ export function HomeOperationalPage() {
                 }
               >
                 {item.origemOperacional === "pedido_whatsapp"
-                  ? "Pedido WhatsApp"
+                  ? "Venda online"
                   : item.origemOperacional === "venda_loja"
-                    ? "Venda na loja"
+                    ? "Loja física"
                     : item.origemOperacional === "devolucao"
                       ? "Devolucao"
                       : "Reposicao"}

@@ -20,8 +20,8 @@ type CommercialOrderFormProps = {
 };
 
 const canalOptions: Array<{ value: VendaCanal; label: string }> = [
-  { value: "loja", label: "Loja" },
-  { value: "whatsapp", label: "WhatsApp" },
+  { value: "loja_fisica", label: "Loja Física" },
+  { value: "online", label: "Online" },
 ];
 
 const statusOptions: Array<{ value: VendaStatus; label: string }> = [
@@ -32,7 +32,7 @@ const statusOptions: Array<{ value: VendaStatus; label: string }> = [
 ];
 
 export function CommercialOrderForm({
-  defaultCanal = "loja",
+  defaultCanal = "loja_fisica",
 }: CommercialOrderFormProps) {
   const produtoIds = useEstoqueStore((state) => state.entities.produtos.allIds);
   const produtosById = useEstoqueStore((state) => state.entities.produtos.byId);
@@ -69,7 +69,7 @@ export function CommercialOrderForm({
   const [observacao, setObservacao] = useState("");
   const [canal, setCanal] = useState<VendaCanal>(defaultCanal);
   const [status, setStatus] = useState<VendaStatus>(
-    defaultCanal === "whatsapp" ? "aguardando_confirmacao" : "em_aberto",
+    defaultCanal === "online" ? "aguardando_confirmacao" : "em_aberto",
   );
   const [items, setItems] = useState<ItemForm[]>([{ produtoId: "", quantidade: 1 }]);
 
@@ -81,7 +81,7 @@ export function CommercialOrderForm({
 
   useEffect(() => {
     setCanal(defaultCanal);
-    setStatus(defaultCanal === "whatsapp" ? "aguardando_confirmacao" : "em_aberto");
+    setStatus(defaultCanal === "online" ? "aguardando_confirmacao" : "em_aberto");
   }, [defaultCanal]);
 
   const preparedItems = useMemo(
@@ -132,7 +132,7 @@ export function CommercialOrderForm({
     setTelefone("");
     setObservacao("");
     setCanal(defaultCanal);
-    setStatus(defaultCanal === "whatsapp" ? "aguardando_confirmacao" : "em_aberto");
+    setStatus(defaultCanal === "online" ? "aguardando_confirmacao" : "em_aberto");
     setItems([{ produtoId: "", quantidade: 1 }]);
   }
 
@@ -216,7 +216,7 @@ export function CommercialOrderForm({
           tipo: "saida",
           status: "confirmada",
           origemTipo: "manual",
-          origemOperacional: canal === "whatsapp" ? "pedido_whatsapp" : "venda_loja",
+          origemOperacional: canal === "online" ? "pedido_whatsapp" : "venda_loja",
           origemId: registroId,
           produtoId: item.produto.id,
           depositoOrigemId: depositoId,
@@ -233,9 +233,9 @@ export function CommercialOrderForm({
       tone: "success",
       title: precisaBaixarEstoque ? "Registro salvo e estoque atualizado." : "Registro comercial salvo.",
       description:
-        canal === "whatsapp"
-          ? "O canal ficou marcado como WhatsApp."
-          : "O canal ficou marcado como Loja.",
+        canal === "online"
+          ? "O canal ficou marcado como Online."
+          : "O canal ficou marcado como Loja Física.",
     });
     resetForm();
   }
@@ -244,7 +244,7 @@ export function CommercialOrderForm({
     <PageContainer>
       <SectionHeader
         title="Novo registro comercial"
-        description="Use a mesma tela para loja e WhatsApp. O canal vira um atributo do pedido ou da venda."
+        description="Use a mesma tela para toda venda. O canal vira um atributo obrigatório do registro."
         actions={[{ label: "Ver vendas", variant: "secondary", href: "/vendas" }]}
       />
 
@@ -261,8 +261,8 @@ export function CommercialOrderForm({
                 Cliente, canal, status e itens no mesmo fluxo.
               </p>
             </div>
-            <StatusBadge variant={canal === "whatsapp" ? "info" : "success"}>
-              {canal === "whatsapp" ? "WhatsApp" : "Loja"}
+            <StatusBadge variant={canal === "online" ? "info" : "success"}>
+              {canal === "online" ? "Online" : "Loja Física"}
             </StatusBadge>
           </div>
 
@@ -293,6 +293,7 @@ export function CommercialOrderForm({
                 value={canal}
                 onChange={(event) => setCanal(event.target.value as VendaCanal)}
                 className={inputClassName}
+                required
               >
                 {canalOptions.map((option) => (
                   <option key={option.value} value={option.value}>

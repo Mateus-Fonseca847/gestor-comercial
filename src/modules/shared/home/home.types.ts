@@ -1,7 +1,7 @@
 export type HomeSale = {
   id: string;
   cliente: string;
-  canal: "Loja" | "WhatsApp";
+  canal: "Loja Física" | "Online";
   valor: number;
   hora: string;
 };
@@ -9,7 +9,7 @@ export type HomeSale = {
 export type HomeClient = {
   id: string;
   nome: string;
-  origem: "Loja" | "WhatsApp";
+  origem: "Loja Física" | "Online";
   ultimaInteracao: string;
 };
 
@@ -20,7 +20,7 @@ export type HomeSalesSummary = {
 };
 
 export type HomeChannelSummary = {
-  canal: "Loja" | "WhatsApp";
+  canal: "Loja Física" | "Online";
   quantidadePedidos: number;
   valorTotal: number;
 };

@@ -13,7 +13,7 @@ export default async function VendasChildPage({
   }
 
   if (slug === "pedidos") {
-    redirect("/vendas/nova?canal=whatsapp");
+    redirect("/vendas/nova?canal=online");
   }
 
   if (slug !== "historico") {

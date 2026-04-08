@@ -29,56 +29,61 @@ export function DashboardKpiTile({
   return (
     <article
       className={[
-        "rounded-[26px] border bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-6 shadow-[0_12px_28px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.08)]",
+        "flex min-h-[168px] flex-col justify-between rounded-[28px] border bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,252,0.95)_100%)] p-6 shadow-[0_18px_40px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_46px_rgba(15,23,42,0.10)]",
         tone === "danger"
-          ? "border-red-200"
+          ? "border-red-200/90"
           : tone === "warning"
-            ? "border-yellow-200"
+            ? "border-amber-200/90"
             : tone === "info"
-              ? "border-blue-200"
-              : "border-[var(--color-border)]",
+              ? "border-blue-200/90"
+              : "border-[rgba(148,163,184,0.18)]",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-4">
-          <p className="text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-[var(--color-text-soft)]">
+        <div className="space-y-3">
+          <p className="text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
             {label}
           </p>
-          <p className="text-[1.75rem] font-bold tracking-tight text-[var(--color-text)]">
+          <p className="text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-text)]">
             {value}
           </p>
-          {context ? (
-            <div
-              className={[
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
-                tone === "danger"
-                  ? "bg-red-50 text-red-700"
-                  : tone === "warning"
-                    ? "bg-yellow-50 text-yellow-700"
-                    : tone === "info"
-                      ? "bg-blue-50 text-blue-700"
-                      : "bg-[var(--color-surface-alt)] text-[var(--color-text-soft)]",
-              ].join(" ")}
-            >
-              {trendIcon}
-              {context}
-            </div>
-          ) : null}
         </div>
         <div
           className={[
-            "flex h-11 w-11 items-center justify-center rounded-[18px] border",
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] border",
             tone === "danger"
               ? "border-red-100 bg-red-50 text-red-700"
               : tone === "warning"
-                ? "border-yellow-100 bg-yellow-50 text-yellow-700"
-                : "border-[rgba(0,74,173,0.08)] bg-[rgba(0,74,173,0.06)] text-[var(--color-primary)]",
+                ? "border-amber-100 bg-amber-50 text-amber-700"
+                : tone === "info"
+                  ? "border-blue-100 bg-blue-50 text-blue-700"
+                  : "border-[rgba(148,163,184,0.18)] bg-[rgba(248,250,252,0.92)] text-[var(--color-primary)]",
           ].join(" ")}
         >
           <Package className="h-5 w-5" />
         </div>
       </div>
-      <p className="mt-3 text-sm leading-6 text-[var(--color-text-soft)]">{note}</p>
+
+      <div className="mt-5 space-y-3 border-t border-[rgba(148,163,184,0.16)] pt-4">
+        {context ? (
+          <div
+            className={[
+              "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+              tone === "danger"
+                ? "bg-red-50 text-red-700"
+                : tone === "warning"
+                  ? "bg-amber-50 text-amber-700"
+                  : tone === "info"
+                    ? "bg-blue-50 text-blue-700"
+                    : "bg-[var(--color-surface-alt)] text-[var(--color-text-soft)]",
+            ].join(" ")}
+          >
+            {trendIcon}
+            {context}
+          </div>
+        ) : null}
+        <p className="text-sm leading-6 text-[var(--color-text-soft)]">{note}</p>
+      </div>
     </article>
   );
 }

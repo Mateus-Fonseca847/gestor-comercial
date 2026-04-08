@@ -31,7 +31,7 @@ export function useHomeOperationalData() {
 
   const channelSummary = useMemo(
     () =>
-      (["Loja", "WhatsApp"] as const).map((canal) => {
+      (["Loja Física", "Online"] as const).map((canal) => {
         const sales = homeSalesMock.filter((sale) => sale.canal === canal);
 
         return {
@@ -139,8 +139,8 @@ export function useHomeOperationalData() {
 }
 
 function formatOrigemOperacional(origem?: string) {
-  if (origem === "venda_loja") return "Venda na loja";
-  if (origem === "pedido_whatsapp") return "Pedido WhatsApp";
+  if (origem === "venda_loja") return "Venda da loja";
+  if (origem === "pedido_whatsapp") return "Venda online";
   if (origem === "reposicao_estoque") return "Reposição";
   if (origem === "devolucao") return "Devolução";
   return "Operação";

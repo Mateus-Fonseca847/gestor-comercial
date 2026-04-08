@@ -160,7 +160,7 @@ export function SalesOrderForm({ mode }: SalesOrderFormProps) {
     }
 
     const vendaId = vendasActions.salvarVendaRascunho({
-      canal: "loja",
+      canal: "loja_fisica",
       clienteNome,
       depositoId: depositoId || undefined,
       observacao,
@@ -509,4 +509,3 @@ function formatCurrency(value: number) {
     currency: "BRL",
   }).format(value);
 }
-

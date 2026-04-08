@@ -18,7 +18,7 @@ type VendasStore = {
   };
 };
 
-function createVendaId(prefix: "VEN" | "WPP") {
+function createVendaId(prefix: "VEN" | "ONL") {
   return `${prefix}-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 }
 
@@ -45,7 +45,7 @@ function createVendaRegistro(input: SalvarVendaInput): VendaRegistro | null {
   const timestamp = new Date().toISOString();
 
   return {
-    id: createVendaId(input.canal === "whatsapp" ? "WPP" : "VEN"),
+    id: createVendaId(input.canal === "online" ? "ONL" : "VEN"),
     canal: input.canal,
     status: input.status,
     clienteNome: input.clienteNome.trim(),
@@ -93,7 +93,7 @@ export const useVendasStore = create<VendasStore>()(
         concluirVenda: (input) => {
           const venda = createVendaRegistro({
             ...input,
-            canal: "loja",
+            canal: "loja_fisica",
             status: "concluida",
           });
 
@@ -110,7 +110,7 @@ export const useVendasStore = create<VendasStore>()(
         criarPedidoWhatsapp: (input) => {
           const venda = createVendaRegistro({
             ...input,
-            canal: "whatsapp",
+            canal: "online",
             status: "aguardando_confirmacao",
           });
 

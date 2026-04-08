@@ -9,12 +9,14 @@ type DataTableProps<T> = {
   columns: Column<T>[];
   data: T[];
   emptyState?: React.ReactNode;
+  onRowClick?: (row: T) => void;
 };
 
 export function DataTable<T extends { id: string | number }>({
   columns,
   data,
   emptyState,
+  onRowClick,
 }: DataTableProps<T>) {
   if (!data.length) {
     return <>{emptyState}</>;
@@ -43,7 +45,11 @@ export function DataTable<T extends { id: string | number }>({
             {data.map((row) => (
               <tr
                 key={row.id}
-                className="border-b border-[var(--color-border)] last:border-b-0 transition-colors hover:bg-[#f8fbff]"
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                className={[
+                  "border-b border-[var(--color-border)] last:border-b-0 transition-colors hover:bg-[#f8fbff]",
+                  onRowClick ? "cursor-pointer" : "",
+                ].join(" ")}
               >
                 {columns.map((column) => (
                   <td

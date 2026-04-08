@@ -1,4 +1,4 @@
-export type VendaCanal = "loja" | "whatsapp";
+export type VendaCanal = "loja_fisica" | "online";
 
 export type VendaStatus =
   | "em_aberto"

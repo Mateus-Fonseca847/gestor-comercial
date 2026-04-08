@@ -3,5 +3,5 @@
 import { CommercialOrderForm } from "@/modules/vendas/components/commercial-order-form";
 
 export function NovoPedidoWhatsappPage() {
-  return <CommercialOrderForm defaultCanal="whatsapp" />;
+  return <CommercialOrderForm defaultCanal="online" />;
 }

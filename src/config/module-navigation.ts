@@ -10,12 +10,6 @@ export type ModuleNavItem = {
 
 export const moduleNavigation: ModuleNavItem[] = [
   {
-    label: "Home",
-    href: "/",
-    behavior: "link",
-    priority: "primary",
-  },
-  {
     label: "Estoque",
     href: "/estoque",
     behavior: "menu",
@@ -54,7 +48,6 @@ export const moduleNavigation: ModuleNavItem[] = [
           items: [
             { title: "Resumo", href: "/vendas" },
             { title: "Nova venda", href: "/vendas/nova", badge: "Novo" },
-            { title: "Pedido WhatsApp", href: "/vendas/nova?canal=whatsapp" },
             { title: "Histórico", href: "/vendas/historico" },
             { title: "Relatórios", href: "/vendas/relatorios" },
           ],
@@ -81,5 +74,11 @@ export const moduleNavigation: ModuleNavItem[] = [
         },
       ],
     },
+  },
+  {
+    label: "Tarefas",
+    href: "/tarefas",
+    behavior: "link",
+    priority: "primary",
   },
 ];
