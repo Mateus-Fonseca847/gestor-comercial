@@ -12,24 +12,23 @@ export function StatCard({ label, value, description, onClick }: StatCardProps) 
     <article
       onClick={onClick}
       className={[
-        "rounded-[24px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[var(--shadow-sm)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        "ui-surface-2 border-l-4 border-l-[var(--color-primary)] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(21,93,252,0.1)]",
         onClick ? "cursor-pointer" : "",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-4">
-          <p className="text-sm font-medium text-[var(--color-text-soft)]">{label}</p>
-          <p className="text-2xl font-bold tracking-tight text-[var(--color-text)]">
-            {value}
-          </p>
+          <p className="ui-metric-label">{label}</p>
+          <p className="ui-metric-value">{value}</p>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[rgba(0,74,173,0.08)] text-[var(--color-primary)]">
+        <div className="ui-icon-chip-strong">
           <BarChart3 className="h-5 w-5" />
         </div>
       </div>
-      <p className="mt-3 text-sm leading-6 text-[var(--color-text-muted)]">
-        {description}
-      </p>
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <p className="ui-metric-note">{description}</p>
+        <span className="ui-brand-badge">Hoje</span>
+      </div>
     </article>
   );
 }

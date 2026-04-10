@@ -10,11 +10,11 @@ export function FormSectionCard({
   children,
 }: FormSectionCardProps) {
   return (
-    <section className="rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-[0_12px_30px_rgba(0,74,173,0.06)]">
+    <section className="ui-surface-1 p-6">
       <div className="mb-5 space-y-1">
-        <h2 className="text-lg font-semibold text-[var(--color-primary)]">{title}</h2>
+        <h2 className="ui-section-title text-[var(--color-primary)]">{title}</h2>
         {description ? (
-          <p className="text-sm text-[var(--color-text-soft)]">{description}</p>
+          <p className="ui-body">{description}</p>
         ) : null}
       </div>
       {children}

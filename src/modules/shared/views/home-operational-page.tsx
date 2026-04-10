@@ -109,7 +109,7 @@ export function HomeOperationalPage() {
           </div>
         </article>
 
-        <section className="rounded-[30px] border border-[var(--color-border)]/90 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-6 shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+        <section className="ui-surface-1 p-6">
           <div className="mb-5">
             <h2 className="text-lg font-semibold text-[var(--color-text)]">Reposicao</h2>
             <p className="text-sm text-[var(--color-text-soft)]">
@@ -121,7 +121,7 @@ export function HomeOperationalPage() {
             {replenishmentItems.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between gap-3 rounded-[22px] border border-[var(--color-border)]/80 bg-[var(--color-surface-alt)] px-4 py-3"
+                className="ui-interactive-item flex items-center justify-between gap-3 rounded-[22px] border border-[var(--color-border)]/80 bg-[var(--color-surface-alt)] px-4 py-3"
               >
                 <div>
                   <p className="font-medium text-[var(--color-text)]">{item.nome}</p>
@@ -184,7 +184,7 @@ export function HomeOperationalPage() {
       />
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <section className="rounded-[30px] border border-[var(--color-border)]/90 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-6 shadow-[0_12px_28px_rgba(15,23,42,0.06)]">
+        <section className="ui-surface-1 p-6">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-[var(--color-text)]">Pedidos por canal</h2>
@@ -199,7 +199,7 @@ export function HomeOperationalPage() {
             {channelSummary.map((item) => (
               <div
                 key={item.canal}
-                className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-4"
+                className="ui-interactive-item rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-4"
               >
                 <p className="text-sm text-[var(--color-text-soft)]">{item.canal}</p>
                 <p className="mt-2 text-xl font-semibold text-[var(--color-text)]">
@@ -294,7 +294,7 @@ function HighlightCard({
   note: string;
 }) {
   return (
-    <div className="rounded-[22px] border border-[var(--color-border)]/80 bg-white/80 px-4 py-4 backdrop-blur-sm">
+    <div className="ui-interactive-item rounded-[22px] border border-[var(--color-border)]/80 bg-white/80 px-4 py-4 backdrop-blur-sm">
       <p className="text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-soft)]">
         {label}
       </p>

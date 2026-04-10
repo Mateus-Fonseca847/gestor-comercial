@@ -6,7 +6,7 @@ type StatusBadgeProps = {
 };
 
 const variantClasses: Record<StatusBadgeProps["variant"], string> = {
-  info: "border border-blue-200 bg-blue-50 text-blue-700",
+  info: "border border-[rgba(21,93,252,0.14)] bg-[rgba(21,93,252,0.08)] text-[var(--color-primary)]",
   success: "border border-emerald-200 bg-emerald-50 text-emerald-700",
   warning: "border border-yellow-200 bg-yellow-50 text-yellow-700",
   danger: "border border-red-200 bg-red-50 text-red-700",

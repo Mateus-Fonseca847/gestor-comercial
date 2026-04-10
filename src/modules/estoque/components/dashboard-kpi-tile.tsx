@@ -29,24 +29,20 @@ export function DashboardKpiTile({
   return (
     <article
       className={[
-        "flex min-h-[168px] flex-col justify-between rounded-[28px] border bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,252,0.95)_100%)] p-6 shadow-[0_18px_40px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_46px_rgba(15,23,42,0.10)]",
+        "flex min-h-[168px] flex-col justify-between rounded-[28px] border bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_22px_46px_rgba(15,23,42,0.10)]",
         tone === "danger"
           ? "border-red-200/90"
           : tone === "warning"
             ? "border-amber-200/90"
             : tone === "info"
-              ? "border-blue-200/90"
+              ? "ui-surface-brand border-[rgba(169,197,255,0.28)]"
               : "border-[rgba(148,163,184,0.18)]",
       ].join(" ")}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-3">
-          <p className="text-[0.74rem] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-soft)]">
-            {label}
-          </p>
-          <p className="text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-text)]">
-            {value}
-          </p>
+          <p className={tone === "info" ? "ui-metric-label ui-text-inverse-muted" : "ui-metric-label"}>{label}</p>
+          <p className={tone === "info" ? "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-white" : "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-text)]"}>{value}</p>
         </div>
         <div
           className={[
@@ -56,7 +52,7 @@ export function DashboardKpiTile({
               : tone === "warning"
                 ? "border-amber-100 bg-amber-50 text-amber-700"
                 : tone === "info"
-                  ? "border-blue-100 bg-blue-50 text-blue-700"
+                  ? "ui-icon-chip-brand"
                   : "border-[rgba(148,163,184,0.18)] bg-[rgba(248,250,252,0.92)] text-[var(--color-primary)]",
           ].join(" ")}
         >
@@ -74,7 +70,7 @@ export function DashboardKpiTile({
                 : tone === "warning"
                   ? "bg-amber-50 text-amber-700"
                   : tone === "info"
-                    ? "bg-blue-50 text-blue-700"
+                    ? "ui-brand-badge-inverse"
                     : "bg-[var(--color-surface-alt)] text-[var(--color-text-soft)]",
             ].join(" ")}
           >
@@ -82,7 +78,7 @@ export function DashboardKpiTile({
             {context}
           </div>
         ) : null}
-        <p className="text-sm leading-6 text-[var(--color-text-soft)]">{note}</p>
+        <p className={tone === "info" ? "ui-text-inverse-soft text-sm leading-6" : "text-sm leading-6 text-[var(--color-text-soft)]"}>{note}</p>
       </div>
     </article>
   );

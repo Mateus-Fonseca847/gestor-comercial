@@ -23,7 +23,7 @@ export function DataTable<T extends { id: string | number }>({
   }
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--shadow-sm)]">
+    <section className="ui-surface-1 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse">
           <thead>
@@ -47,7 +47,7 @@ export function DataTable<T extends { id: string | number }>({
                 key={row.id}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={[
-                  "border-b border-[var(--color-border)] last:border-b-0 transition-colors hover:bg-[#f8fbff]",
+                  "border-b border-[var(--color-border)] last:border-b-0 transition-all duration-300 hover:bg-[var(--color-surface-muted)]",
                   onRowClick ? "cursor-pointer" : "",
                 ].join(" ")}
               >
