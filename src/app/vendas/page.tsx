@@ -1,5 +1,5 @@
-import { ModuleDashboardScreen } from "@/modules/shared/components/module-screens";
+import { VendasDashboardPage } from "@/modules/vendas/views/vendas-dashboard-page";
 
 export default function VendasPage() {
-  return <ModuleDashboardScreen moduleKey="vendas" />;
+  return <VendasDashboardPage />;
 }

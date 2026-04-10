@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { ModuleChildScreen, ModuleReportsScreen } from "@/modules/shared/components/module-screens";
+import { ClientesPage } from "@/modules/cadastros/views/clientes-page";
+import { ModuleReportsScreen } from "@/modules/shared/components/module-screens";
 
 export default async function CadastrosChildPage({
   params,
@@ -16,5 +17,5 @@ export default async function CadastrosChildPage({
     notFound();
   }
 
-  return <ModuleChildScreen moduleKey="cadastros" slug={slug} />;
+  return <ClientesPage />;
 }

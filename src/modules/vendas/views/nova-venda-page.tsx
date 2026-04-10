@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { CommercialOrderForm } from "@/modules/vendas/components/commercial-order-form";
+import { SaleRegistrationForm } from "@/modules/vendas/components/sale-registration-form";
 
 export function NovaVendaPage() {
   const searchParams = useSearchParams();
@@ -9,5 +9,5 @@ export function NovaVendaPage() {
   const canal =
     canalParam === "online" || canalParam === "whatsapp" ? "online" : "loja_fisica";
 
-  return <CommercialOrderForm defaultCanal={canal} />;
+  return <SaleRegistrationForm defaultCanal={canal} />;
 }

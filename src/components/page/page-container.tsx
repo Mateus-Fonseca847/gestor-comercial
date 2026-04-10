@@ -3,5 +3,5 @@ type PageContainerProps = {
 };
 
 export function PageContainer({ children }: PageContainerProps) {
-  return <div className="space-y-8">{children}</div>;
+  return <div className="space-y-6">{children}</div>;
 }

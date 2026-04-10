@@ -78,14 +78,14 @@ export function HomeOperationalPage() {
           <div className="absolute inset-y-0 left-0 w-1.5 bg-[var(--color-primary)]" />
           <div className="relative space-y-6">
             <div className="inline-flex rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-text-soft)]">
-              Operacao do dia
+              Resumo do dia
             </div>
             <div className="space-y-2">
               <h2 className="text-3xl font-semibold tracking-tight text-[var(--color-text)]">
-                O que precisa da sua atencao agora.
+                Veja rápido como foi o movimento de hoje.
               </h2>
               <p className="max-w-2xl text-sm leading-7 text-[var(--color-text-soft)]">
-                A Home ja esta pronta para evoluir com vendas, clientes e pedidos por canal sem quebrar a interface.
+                Acompanhe vendas, clientes e estoque em um só lugar para decidir o que fazer em seguida.
               </p>
             </div>
 
