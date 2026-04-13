@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { ModuleChildScreen, ModuleReportsScreen } from "@/modules/shared/components/module-screens";
+import { ModuleChildScreen } from "@/modules/shared/components/module-screens";
+import { VendasSalesReportPage } from "@/modules/vendas/views/vendas-sales-report-page";
 
 export default async function VendasChildPage({
   params,
@@ -9,7 +10,7 @@ export default async function VendasChildPage({
   const { slug } = await params;
 
   if (slug === "relatorios") {
-    return <ModuleReportsScreen moduleKey="vendas" />;
+    return <VendasSalesReportPage />;
   }
 
   if (slug === "pedidos") {

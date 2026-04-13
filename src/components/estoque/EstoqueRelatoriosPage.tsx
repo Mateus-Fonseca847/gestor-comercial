@@ -408,7 +408,6 @@ export default function EstoqueRelatoriosPage() {
       <SectionHeader
         title="Relatórios de estoque"
         description="Acompanhe ruptura, giro e reposição com foco no que pede ação agora."
-        actions={[{ label: "Ver reposição", href: "/estoque/reposicao" }]}
       />
 
       <section className="grid gap-4 lg:grid-cols-4">

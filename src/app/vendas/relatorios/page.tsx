@@ -1,5 +1,5 @@
-import { ModuleReportsScreen } from "@/modules/shared/components/module-screens";
+import { VendasSalesReportPage } from "@/modules/vendas/views/vendas-sales-report-page";
 
 export default function VendasRelatoriosRoute() {
-  return <ModuleReportsScreen moduleKey="vendas" />;
+  return <VendasSalesReportPage />;
 }

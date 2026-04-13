@@ -10,11 +10,12 @@ import {
   UserRoundCog,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import GestifyHomeButton from "@/components/layout/gestify-home-button";
 import { ModuleMegaMenu } from "@/components/navigation/module-mega-menu";
 import { moduleNavigation } from "@/config/module-navigation";
 import { navigationItems } from "@/config/navigation";
+import { platformSearchItems } from "@/config/platform-search";
 
 type AuthMode = "login" | "cadastro";
 
@@ -31,8 +32,12 @@ const menuItemClass =
 
 export function AppHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const searchRef = useRef<HTMLDivElement | null>(null);
   const settingsRef = useRef<HTMLDivElement | null>(null);
   const userRef = useRef<HTMLDivElement | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -47,6 +52,10 @@ export function AppHeader() {
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
       const target = event.target as Node;
+
+      if (searchRef.current && !searchRef.current.contains(target)) {
+        setIsSearchOpen(false);
+      }
 
       if (settingsRef.current && !settingsRef.current.contains(target)) {
         setIsSettingsOpen(false);
@@ -63,6 +72,7 @@ export function AppHeader() {
 
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        setIsSearchOpen(false);
         setIsSettingsOpen(false);
         setIsUserMenuOpen(false);
         setIsAuthModalOpen(false);
@@ -119,6 +129,31 @@ export function AppHeader() {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("");
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const searchResults = normalizedSearch
+    ? platformSearchItems
+        .map((item) => {
+          const haystack = [item.title, item.description, item.category, ...item.keywords]
+            .join(" ")
+            .toLowerCase();
+          const score =
+            (item.title.toLowerCase().startsWith(normalizedSearch) ? 4 : 0) +
+            (item.title.toLowerCase().includes(normalizedSearch) ? 2 : 0) +
+            (haystack.includes(normalizedSearch) ? 1 : 0);
+
+          return { item, score };
+        })
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score || a.item.title.localeCompare(b.item.title))
+        .slice(0, 8)
+    : platformSearchItems.slice(0, 6).map((item) => ({ item, score: 0 }));
+
+  function handleSearchSelect(href: string) {
+    setSearchTerm("");
+    setIsSearchOpen(false);
+    router.push(href);
+  }
 
   return (
     <>
@@ -179,14 +214,72 @@ export function AppHeader() {
         </nav>
 
           <div className="flex flex-[0_0_auto] items-center justify-end gap-2">
-            <label className="flex h-11 w-[280px] items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-[var(--color-text-soft)] transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
-              <Search className="h-4 w-4 shrink-0" />
-              <input
-                type="search"
-                placeholder="Pesquisar"
-                className="w-full border-0 bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-muted)]"
-              />
-            </label>
+            <div className="relative" ref={searchRef}>
+              <label className="flex h-11 w-[320px] items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 text-[var(--color-text-soft)] transition-all focus-within:border-[var(--color-primary)] focus-within:bg-white">
+                <Search className="h-4 w-4 shrink-0" />
+                <input
+                  type="search"
+                  value={searchTerm}
+                  onFocus={() => setIsSearchOpen(true)}
+                  onChange={(event) => {
+                    setSearchTerm(event.target.value);
+                    setIsSearchOpen(true);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && searchResults[0]) {
+                      event.preventDefault();
+                      handleSearchSelect(searchResults[0].item.href);
+                    }
+                  }}
+                  placeholder="Buscar páginas, ações ou funcionalidades"
+                  className="w-full border-0 bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-muted)]"
+                />
+              </label>
+
+              {isSearchOpen ? (
+                <div className="absolute right-0 top-[calc(100%+0.75rem)] z-50 w-[420px] rounded-[24px] border border-[var(--color-border)] bg-white p-3 shadow-[0_24px_60px_rgba(15,23,42,0.14)]">
+                  <div className="mb-2 px-2 pb-2">
+                    <p className="text-sm font-semibold text-[var(--color-text)]">
+                      {normalizedSearch ? "Sugestões da plataforma" : "Acessos rápidos"}
+                    </p>
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      {normalizedSearch
+                        ? "Abra páginas e ações sem passar pelo menu."
+                        : "Digite para encontrar páginas, ações e atalhos da plataforma."}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    {searchResults.length ? (
+                      searchResults.map(({ item }) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => handleSearchSelect(item.href)}
+                          className="flex w-full items-start justify-between gap-4 rounded-2xl px-3 py-3 text-left transition-all duration-200 hover:bg-[var(--color-surface-alt)]"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-[var(--color-text)]">
+                              {item.title}
+                            </p>
+                            <p className="mt-1 text-xs text-[var(--color-text-muted)]">
+                              {item.description}
+                            </p>
+                          </div>
+                          <span className="shrink-0 rounded-full border border-[rgba(21,93,252,0.16)] bg-[rgba(21,93,252,0.06)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-primary)]">
+                            {item.category}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="rounded-2xl border border-dashed border-[var(--color-border)] px-4 py-6 text-sm text-[var(--color-text-soft)]">
+                        Nada encontrado para essa busca.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
 
             <div className="relative" ref={settingsRef}>
               <button

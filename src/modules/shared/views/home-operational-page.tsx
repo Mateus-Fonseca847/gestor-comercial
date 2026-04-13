@@ -35,12 +35,6 @@ const quickActions = [
     href: "/estoque/entradas",
     icon: Receipt,
   },
-  {
-    label: "Ver reposicao",
-    description: "Abrir a fila de itens que precisam ser repostos.",
-    href: "/estoque/reposicao",
-    icon: PackagePlus,
-  },
 ];
 
 export function HomeOperationalPage() {
@@ -111,9 +105,9 @@ export function HomeOperationalPage() {
 
         <section className="ui-surface-1 p-6">
           <div className="mb-5">
-            <h2 className="text-lg font-semibold text-[var(--color-text)]">Reposicao</h2>
+            <h2 className="text-lg font-semibold text-[var(--color-text)]">Estoque em atenção</h2>
             <p className="text-sm text-[var(--color-text-soft)]">
-              Itens que ja merecem compra ou conferencia.
+              Itens com saldo baixo ou zerado para acompanhar agora.
             </p>
           </div>
 
@@ -137,7 +131,7 @@ export function HomeOperationalPage() {
 
             {!replenishmentItems.length ? (
               <div className="rounded-[22px] border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-5 text-sm text-[var(--color-text-soft)]">
-                Nenhum item critico no momento.
+                Nenhum item crítico no momento.
               </div>
             ) : null}
           </div>
@@ -252,7 +246,7 @@ export function HomeOperationalPage() {
 
         <DashboardListBlock
           title="Movimentacoes ligadas a operacao comercial"
-          description="Entradas, saidas e reservas relacionadas a vendas e reposicao."
+          description="Entradas, saídas e reservas ligadas às vendas e ao dia a dia da loja."
           href="/estoque/movimentacoes"
           items={commercialStockMovements.map((item) => ({
             id: item.id,
@@ -269,12 +263,12 @@ export function HomeOperationalPage() {
                 }
               >
                 {item.origemOperacional === "pedido_whatsapp"
-                  ? "Venda online"
+                    ? "Venda online"
                   : item.origemOperacional === "venda_loja"
                     ? "Loja física"
                     : item.origemOperacional === "devolucao"
                       ? "Devolucao"
-                      : "Reposicao"}
+                      : "Operação interna"}
               </StatusBadge>
             ),
           }))}

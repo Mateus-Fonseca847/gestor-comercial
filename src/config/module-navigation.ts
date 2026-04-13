@@ -22,7 +22,6 @@ export const moduleNavigation: ModuleNavItem[] = [
             { title: "Resumo", href: "/estoque" },
             { title: "Produtos", href: "/estoque/produtos" },
             { title: "Movimentações", href: "/estoque/movimentacoes", badge: "Hoje" },
-            { title: "Reposição", href: "/estoque/reposicao", badge: "Acompanhar" },
             { title: "Fornecedores", href: "/estoque/fornecedores" },
             { title: "Relatórios", href: "/estoque/relatorios" },
           ],

@@ -17,32 +17,14 @@ export function DashboardKpiTile({
   tone = "neutral",
   trend = "flat",
 }: DashboardKpiTileProps) {
-  const containerClass =
-    tone === "danger"
-      ? "border-red-200/90 bg-red-50"
-      : tone === "warning"
-        ? "border-amber-200/90 bg-amber-50"
-        : tone === "info"
-          ? "border-[rgba(21,93,252,0.18)] bg-[rgba(237,244,255,0.98)]"
-          : "border-[rgba(21,93,252,0.12)] bg-[rgba(247,250,255,0.96)]";
-
+  const containerClass = "border-[rgba(21,93,252,0.12)] bg-[rgba(247,250,255,0.96)]";
   const valueClass =
-    tone === "danger"
-      ? "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-red-700"
-      : tone === "warning"
-        ? "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-amber-700"
-        : tone === "info"
-          ? "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-primary-strong)]"
-          : "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-text)]";
+    tone === "info"
+      ? "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-primary-strong)]"
+      : "text-[2rem] font-semibold leading-none tracking-[-0.03em] text-[var(--color-text)]";
 
   const iconClass =
-    tone === "danger"
-      ? "border-red-100 bg-red-50 text-red-700"
-      : tone === "warning"
-        ? "border-amber-100 bg-amber-50 text-amber-700"
-        : tone === "info"
-          ? "border-[rgba(21,93,252,0.16)] bg-white text-[var(--color-primary)]"
-          : "border-[rgba(21,93,252,0.12)] bg-[rgba(255,255,255,0.92)] text-[var(--color-primary)]";
+    "border-[rgba(21,93,252,0.12)] bg-[rgba(255,255,255,0.92)] text-[var(--color-primary)]";
 
   const contextClass =
     tone === "danger"
@@ -53,14 +35,7 @@ export function DashboardKpiTile({
           ? "border border-[rgba(21,93,252,0.12)] bg-white text-[var(--color-primary)]"
           : "border border-[rgba(21,93,252,0.12)] bg-white text-[var(--color-primary)]";
 
-  const noteClass =
-    tone === "danger"
-      ? "text-sm leading-6 text-red-700/80"
-      : tone === "warning"
-        ? "text-sm leading-6 text-amber-700/85"
-        : tone === "info"
-          ? "text-sm leading-6 text-[var(--color-primary-strong)]/80"
-          : "text-sm leading-6 text-[var(--color-text-soft)]";
+  const noteClass = "text-sm leading-6 text-[var(--color-text-soft)]";
 
   const trendIcon =
     trend === "up" ? (

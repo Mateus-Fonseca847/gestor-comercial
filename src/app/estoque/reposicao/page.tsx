@@ -1,5 +1,5 @@
-import EstoqueReposicaoPage from "@/components/estoque/EstoqueReposicaoPage";
+import { redirect } from "next/navigation";
 
 export default function EstoqueReposicaoRoute() {
-  return <EstoqueReposicaoPage />;
+  redirect("/estoque/relatorios");
 }
